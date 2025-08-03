@@ -26,7 +26,7 @@ The design of this system is guided by the following core principles:
 
 The system is a monolithic web application built on the Django framework. Its architecture can be visualized in three primary layers:
 
-1.  **Presentation Layer (Frontend):** Responsible for rendering the user interface. This layer is powered by Django's templating engine, styled with a utility-first CSS framework, and served as static assets.
+1.  **Presentation Layer (Frontend):** Responsible for rendering the user interface. This layer is powered by Django's templating engine, styled with a utility-first CSS framework, and served as static assets. (whitenoise)
 2.  **Application Layer (Backend):** Contains the core business logic. This is managed by **Wagtail CMS** and custom Django applications. It handles content management, data processing, user requests, and routing.
 3.  **Data Layer:** Responsible for data persistence and caching. This includes a primary relational database (PostgreSQL is recommended) and an in-memory cache (Redis is recommended).
 
@@ -36,14 +36,15 @@ The system is a monolithic web application built on the Django framework. Its ar
 
 The following technologies will form the foundation of the starter kit. Specific versions are to be determined and managed by the development team.
 
-- **Backend Framework:** Django
-- **Content Management System:** Wagtail CMS
-- **Programming Language:** Python
-- **Database:** PostgreSQL (Recommended for production)
-- **Cache:** Redis (Recommended for production)
-- **Frontend Styling:** Tailwind CSS, DaisyUI
-- **Server Environment:** A standard Python WSGI server (e.g., Gunicorn)
-- **Build Environment:** A Bun js environment is required for the frontend asset build process.
+- **Backend Framework:** Django (5 LTS)
+- **Content Management System:** Wagtail CMS (7 LTS)
+- **Programming Language:** Python (3.12)
+- **Database:** PostgreSQL 17
+- **Cache:** Redis 7 (Valkey)
+- **Frontend Styling:** Tailwind CSS v4, DaisyUI v5 (via python-webpack-boilerplate >= v1.0.4)
+- **Interactivity:** HTMX (htmx.org 2.0.6) + @hotwired/stimulus v3 (via python-webpack-boilerplate >= v1.0.4)
+- **Server Environment:** A standard Python WSGI server (Gunicorn 23.0.0)
+- **Build Environment:** A Bun js environment is required for the frontend asset build process. (not node.js, as bun is compatible with node/npm)
 
 ---
 
@@ -55,11 +56,13 @@ A modular application structure is mandated to ensure separation of concerns.
 - **`apps/`**: A top-level directory to contain all custom applications.
   - **`home`**: Manages the `HomePage` model and templates. Acts as the default site entry point.
   - **`core`**: Contains foundational, project-wide logic. This includes abstract base models (`BasePage`), utility functions, custom template tags, and context processors.
-  - **`theme`**: Manages all frontend assets and the Tailwind CSS integration. It contains no models. Its sole purpose is to house `static_src` files, the Tailwind configuration, and collect the compiled `static` files.
-  - **`blocks`**: (Optional, but recommended) A dedicated app for defining all custom `StreamField` blocks if they become numerous or complex.
+  - **`frontend`**: Manages all frontend assets and the Tailwind CSS v4 integration. It contains no django models. Its sole purpose is to house `static_src` files, the Tailwind configuration, and collect the compiled `static` files. (via python-webpack-boilerplate >= v1.0.4)
+  - **`blocks`**: A dedicated app for defining all custom `StreamField` and other blocks.
   - **`navigation`**: Manages site navigation. This will likely contain `Snippet` models for creating and managing menus.
-  - **`seo`**: Manages global SEO settings and metadata, potentially via Site Settings or abstract models.
-  - **(Other Apps)**: Specialized apps like `blog`, `portfolio`, or `services` can be added as needed.
+  - **`seo`**: Manages global SEO settings and metadata, potentially via Site Settings or abstract models. (wagtail-seo >= 3.1.0)
+  - **`search`**: for site-wide search functionality
+  - **`forms`**: for handling user submissions if marketing sites will include contact and other forms. (wagtail-flexible-forms >= 2.1.0)
+  - **(Other Apps)**: Specialized apps like `blog`, `portfolio`, or `services` can be added.
 
 ---
 
@@ -107,7 +110,7 @@ Site-wide configuration that marketers need to manage will be implemented using 
 - **Site Identity:** Site Name, Logo, Favicon.
 - **Contact Information:** Address, Phone Number, Email.
 - **Social Media:** Links to social media profiles.
-- **Analytics:** Fields for Google Analytics Tracking ID, Google Tag Manager ID, etc.
+- **Analytics:** Fields for Google Analytics Tracking ID, Google Tag Manager ID, etc. [Do not use packages, make it vendor agnostic for analytics]
 - **Global Scripts:** Header and footer script injection fields for marketing tags.
 
 ---
@@ -139,13 +142,13 @@ The **`theme`** app is the single source of truth for frontend assets.
 ### **7. Performance & Optimization Strategy**
 
 - **Caching:**
-  - Implement a production cache backend (Redis).
+  - Implement a production cache backend (Redis). [wagtail-cache >= 3.0.0]
   - Use Wagtail's **frontend cache invalidation** to selectively purge cached pages upon updates.
   - Leverage Django's **template fragment caching** for expensive-to-render but frequently accessed components (e.g., navigation menus).
 - **Database Queries:**
   - Mandate the use of `select_related` and `prefetch_related` in querysets to prevent N+1 query problems, especially when listing pages or snippets.
 - **Image Optimization:**
-  - Strictly use Wagtail's `{% image %}` template tag for all images. This enables on-the-fly resizing and cropping, ensuring that appropriately sized images are served to the user.
+  - Strictly use Wagtail's `{% image %}` template tag for all images. This enables on-the-fly resizing and cropping, ensuring that appropriately sized images are served to the user; consider adding specific guidance on image formats (WebP) and responsive image sets.
 - **Asset Minification:**
   - The Tailwind CSS build process should be configured to minify the final CSS output for production.
 
@@ -159,6 +162,7 @@ The **`theme`** app is the single source of truth for frontend assets.
 - **Help Text:** All fields in the Wagtail admin must have clear and concise `help_text`.
 - **Block Grouping:** In `StreamField` definitions, blocks should be logically grouped using `group` attributes to create a cleaner UI.
 - **Preview:** The Wagtail preview functionality must work flawlessly for all page and block types.
+- **Accessibility**: Add WCAG compliance requirements and accessibility testing to the DX/UX section.
 
 #### **8.2. Developer DX Enhancements**
 
@@ -175,3 +179,11 @@ The **`theme`** app is the single source of truth for frontend assets.
 - **Static Files:** A production-grade static file serving strategy is required, such as using WhiteNoise or a Content Delivery Network (CDN).
 - **CI/CD Pipeline:** A continuous integration and deployment pipeline should be configured to automate testing, frontend asset building, static file collection, database migrations, and deployment.
 - **Logging & Monitoring:** Configure structured logging and integrate with a monitoring service to track application performance and errors in production.
+- **Containerization**: Docker support for consistent development and deployment environments.
+- **Monitoring**: Be more specific about monitoring tools (e.g., Sentry for error tracking, New Relic for performance).
+- **Backup Strategy**: Include database backup and recovery procedures. (Wagtail Admin Integration)
+
+NOTE:
+
+- do not use outdated and unmaintained packages; but keep long term stability in mind.
+- use modern and fast tools as much as possible (but must be stable.)
