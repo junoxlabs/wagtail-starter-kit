@@ -1,0 +1,20 @@
+{% load wagtailimages_tags %}
+
+<div class="card bg-base-100 shadow-xl my-4">
+    {% if self.image %}
+        <figure class="px-4 pt-4">
+            {% image self.image width-400 class="rounded-xl" %}
+        </figure>
+    {% endif %}
+    <div class="card-body">
+        <h2 class="card-title">{{ self.title }}</h2>
+        <div class="card-text">
+            {{ self.text }}
+        </div>
+        {% if self.link and self.link_text %}
+            <div class="card-actions justify-end">
+                <a href="{{ self.link }}" class="btn btn-primary">{{ self.link_text }}</a>
+            </div>
+        {% endif %}
+    </div>
+</div>

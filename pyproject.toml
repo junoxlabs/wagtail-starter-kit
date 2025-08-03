@@ -1,7 +1,28 @@
 [project]
 name = "wagtail-starter-kit"
 version = "0.1.0"
-description = "Add your description here"
+description = "A modern, flexible Wagtail starter kit for marketing websites"
 readme = "README.md"
 requires-python = ">=3.12"
-dependencies = []
+dependencies = [
+    "Django>=5.2,<5.3",
+    "wagtail>=7.0,<7.1",
+    "python-webpack-boilerplate>=1.0.4",
+    "wagtail-seo>=3.1.0",
+    "wagtail-flexible-forms>=2.1.0",
+    "wagtail-cache>=3.0.0",
+    "django-redis>=5.4.0",
+    "gunicorn>=23.0.0",
+    "whitenoise>=6.7.0",
+    "pillow>=10.4.0",
+    "psycopg[binary]>=3.2.1",
+]
+
+[tool.uv]
+dev-dependencies = [
+    "ruff>=0.6.0",
+    "black>=24.4.0",
+    "isort>=5.13.0",
+    "pytest>=8.3.0",
+    "pytest-django>=4.8.0",
+]

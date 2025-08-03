@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+{% load static wagtailcore_tags wagtailimages_tags webpack_loader %}
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    
+    {# SEO tags from wagtail-seo #}
+    {% if page.seo_title %}
+        <title>{{ page.seo_title }}</title>
+    {% else %}
+        <title>{{ page.title }}</title>
+    {% endif %}
+    
+    {% if page.search_description %}
+        <meta name="description" content="{{ page.search_description }}" />
+    {% endif %}
+    
+    {# Open Graph tags #}
+    {% if page.seo_og_type %}
+        <meta property="og:type" content="{{ page.seo_og_type }}" />
+    {% endif %}
+    
+    {% if page.seo_pagetitle %}
+        <meta property="og:title" content="{{ page.seo_pagetitle }}" />
+    {% endif %}
+    
+    {% if page.seo_description %}
+        <meta property="og:description" content="{{ page.seo_description }}" />
+    {% endif %}
+    
+    {% if page.seo_image_url %}
+        <meta property="og:image" content="{{ page.seo_image_url }}" />
+    {% endif %}
+    
+    {% if page.seo_canonical_url %}
+        <meta property="og:url" content="{{ page.seo_canonical_url }}" />
+    {% endif %}
+    
+    {% if page.seo_sitename %}
+        <meta property="og:site_name" content="{{ page.seo_sitename }}" />
+    {% endif %}
+    
+    {# Twitter Card tags #}
+    {% if page.seo_twitter_card_content %}
+        <meta name="twitter:card" content="{{ page.seo_twitter_card_content }}" />
+    {% endif %}
+    
+    {% if page.seo_pagetitle %}
+        <meta name="twitter:title" content="{{ page.seo_pagetitle }}" />
+    {% endif %}
+    
+    {% if page.seo_description %}
+        <meta name="twitter:description" content="{{ page.seo_description }}" />
+    {% endif %}
+    
+    {% if page.seo_image_url %}
+        <meta name="twitter:image" content="{{ page.seo_image_url }}" />
+    {% endif %}
+    
+    {# Structured data #}
+    {% if page.seo_struct_org_json %}
+        <script type="application/ld+json">{{ page.seo_struct_org_json|safe }}</script>
+    {% endif %}
+    
+    {# Favicon #}
+    <link rel="icon" type="image/x-icon" href="{% static 'favicon.ico' %}" />
+    
+    {# CSS bundle from webpack #}
+    {% render_bundle 'styles' 'css' %}
+    
+
+</head>
+<body class="min-h-screen bg-base-100">
+    {# Site header #}
+    {% include "includes/header.html" %}
+    
+    {# Main content #}
+    <main class="container mx-auto px-4 py-8">
+        {% block content %}{% endblock %}
+    </main>
+    
+    {# Site footer #}
+    {% include "includes/footer.html" %}
+    
+    {# JavaScript bundle from webpack #}
+    {% render_bundle 'main' 'js' %}
+</body>
+</html>

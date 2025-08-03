@@ -1,0 +1,13 @@
+{% load wagtailcore_tags %}
+
+<ul class="flex space-x-6">
+    {% for item in menu_items %}
+        <li>
+            <a href="{{ item.link }}" 
+               class="hover:text-primary"
+               {% if item.open_in_new_tab %}target="_blank" rel="noopener noreferrer"{% endif %}>
+                {{ item.title }}
+            </a>
+        </li>
+    {% endfor %}
+</ul>

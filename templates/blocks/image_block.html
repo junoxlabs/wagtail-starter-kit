@@ -1,0 +1,11 @@
+{% load wagtailimages_tags %}
+
+<figure class="mb-6">
+    {% image self.image width-800 class="rounded-lg shadow-md" %}
+    {% if self.caption %}
+        <figcaption class="text-center text-sm mt-2">{{ self.caption }}</figcaption>
+    {% endif %}
+    {% if self.attribution %}
+        <div class="text-right text-xs mt-1">{{ self.attribution }}</div>
+    {% endif %}
+</figure>

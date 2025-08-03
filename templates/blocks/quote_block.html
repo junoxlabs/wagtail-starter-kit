@@ -1,0 +1,11 @@
+<blockquote class="border-l-4 border-primary pl-4 py-2 my-6 italic">
+    <p class="text-lg">{{ self.quote }}</p>
+    {% if self.author %}
+        <footer class="mt-2">
+            <cite class="font-semibold">{{ self.author }}</cite>
+            {% if self.author_title %}
+                <span class="text-sm">, {{ self.author_title }}</span>
+            {% endif %}
+        </footer>
+    {% endif %}
+</blockquote>

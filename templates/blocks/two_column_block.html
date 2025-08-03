@@ -1,0 +1,12 @@
+<div class="grid grid-cols-1 md:grid-cols-2 gap-8 my-8">
+    <div class="left-column">
+        {% for block in self.left_column %}
+            {% include_block block %}
+        {% endfor %}
+    </div>
+    <div class="right-column">
+        {% for block in self.right_column %}
+            {% include_block block %}
+        {% endfor %}
+    </div>
+</div>

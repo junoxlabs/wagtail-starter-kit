@@ -1,0 +1,16 @@
+{% load static wagtailcore_tags %}
+
+<header class="bg-base-300 py-4">
+    <div class="container mx-auto px-4">
+        <div class="flex justify-between items-center">
+            <div class="logo">
+                <h1 class="text-2xl font-bold">
+                    <a href="/">Wagtail Starter Kit</a>
+                </h1>
+            </div>
+            <nav class="navigation">
+                {% include "includes/navigation.html" %}
+            </nav>
+        </div>
+    </div>
+</header>
