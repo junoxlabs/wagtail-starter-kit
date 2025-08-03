@@ -36,8 +36,8 @@ The system is a monolithic web application built on the Django framework. Its ar
 
 The following technologies will form the foundation of the starter kit. Specific versions are to be determined and managed by the development team.
 
-- **Backend Framework:** Django (5 LTS)
-- **Content Management System:** Wagtail CMS (7 LTS)
+- **Backend Framework:** Django (5.2 LTS)
+- **Content Management System:** Wagtail CMS (7.0 LTS)
 - **Programming Language:** Python (3.12)
 - **Database:** PostgreSQL 17
 - **Cache:** Redis 7 (Valkey)
@@ -133,8 +133,8 @@ The **`theme`** app is the single source of truth for frontend assets.
 
 - **Configuration:** `tailwind.config.js` will define the design system (colors, fonts, spacing) and configure the DaisyUI plugin and theme.
 - **Source Files:** All custom CSS will be located in `theme/static_src/src/styles.css`.
-- **Build Process:** The team will use the `django-tailwind` package's management commands (`tailwind build`, `tailwind watch`) to compile source CSS into a single production-ready CSS file in `theme/static/css/`.
-- **Asset Loading:** The compiled CSS file will be loaded in `base.html` using the `{% tailwind_css %}` template tag.
+- **Build Process:** The team will use the `python-webpack-boilerplate`'s management commands to compile source CSS and JavaScript into production-ready assets in the `frontend/static/` directory.
+- **Asset Loading:** The compiled assets will be loaded in `base.html` using the appropriate template tags provided by `python-webpack-boilerplate`.
 - **Production:** The standard `collectstatic` command will be used to gather all static files for deployment.
 
 ---
