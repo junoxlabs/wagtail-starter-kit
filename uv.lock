@@ -1006,7 +1006,7 @@ requires-dist = [
     { name = "wagtail-cache", specifier = ">=3.0.0" },
     { name = "wagtail-flexible-forms", specifier = ">=2.1.0" },
     { name = "wagtail-seo", specifier = ">=3.1.0" },
-    { name = "whitenoise", specifier = ">=6.7.0" },
+    { name = "whitenoise", specifier = ">=6.9.0" },
 ]
 
 [package.metadata.requires-dev]

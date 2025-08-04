@@ -6,15 +6,15 @@ from wagtailseo.models import SeoMixin
 
 class BasePage(SeoMixin):
     """
-    Abstract base page model that defines common fields and 
+    Abstract base page model that defines common fields and
     functionality that should be shared across all page types.
     Inherits from SeoMixin to provide SEO functionality via wagtail-seo.
     """
-    
+
     # Make this an abstract model
     class Meta:
         abstract = True
-        
+
     # SEO settings specific to this project
     # We're using the SeoMixin from wagtail-seo which provides:
     # - seo_title (inherits from Wagtail Page)
@@ -22,30 +22,31 @@ class BasePage(SeoMixin):
     # - canonical_url
     # - og_image
     # Plus structured data, social meta tags, etc.
-    
+
     # Add any additional fields that are common to all pages but not covered by SeoMixin
     # For example, you might want a custom field for page-specific structured data
     custom_structured_data = models.TextField(
         blank=True,
         null=True,
-        help_text="Additional structured data for this page in JSON-LD format."
+        help_text="Additional structured data for this page in JSON-LD format.",
     )
-    
+
     # Content panels - these will be shown in the content tab
-    base_content_panels = Page.content_panels + [
-        # Add any content panels that are common to all pages
-    ]
+    base_content_panels = Page.content_panels + []
 
     # Promote panels - these will be shown in the promote tab
     base_promote_panels = [
-        FieldPanel('custom_structured_data'),
+        FieldPanel("custom_structured_data"),
     ]
-    
+
     # Settings panels - these will be shown in the settings tab
-    base_settings_panels = Page.settings_panels + [
-        # Add any settings panels that are common to all pages
-    ]
-    
+    base_settings_panels = (
+        Page.settings_panels
+        + [
+            # Add any settings panels that are common to all pages
+        ]
+    )
+
     # Combine all panels
     content_panels = base_content_panels
     promote_panels = SeoMixin.seo_meta_panels + base_promote_panels

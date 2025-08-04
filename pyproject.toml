@@ -13,7 +13,7 @@ dependencies = [
     "wagtail-cache>=3.0.0",
     "django-redis>=5.4.0",
     "gunicorn>=23.0.0",
-    "whitenoise>=6.7.0",
+    "whitenoise>=6.9.0",
     "pillow>=10.4.0",
     "psycopg[binary]>=3.2.1",
 ]

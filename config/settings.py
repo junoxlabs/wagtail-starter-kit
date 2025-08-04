@@ -12,21 +12,21 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = "django-insecure-##ky49$0277*m)j0t7mw&sz-+#1hd7l@kks_)(ex8#mi8d$8t="
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["*"]
 
-
-# Application definition
 
 INSTALLED_APPS = [
+    # whitenoise dev not static
+    # "whitenoise.runserver_nostatic",
+    # Django apps
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-    
     # Wagtail apps
     "wagtail.contrib.forms",
     "wagtail.contrib.redirects",
@@ -39,28 +39,21 @@ INSTALLED_APPS = [
     "wagtail.search",
     "wagtail.admin",
     "wagtail",
-    
     # Optional Wagtail apps
     "wagtail.contrib.routable_page",
     "wagtail.contrib.settings",
     "wagtail.contrib.search_promotions",
-    
     # Third-party apps
     "taggit",
     "modelcluster",
-    
     # SEO
     "wagtailseo",
-    
     # Caching
     "wagtailcache",
-    
     # Forms
     "wagtail_flexible_forms",
-    
     # Webpack integration
     "webpack_boilerplate",
-    
     # Our apps
     "apps.core",
     "apps.home",
@@ -73,8 +66,8 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
-    "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.middleware.security.SecurityMiddleware",
+    "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
@@ -84,9 +77,9 @@ MIDDLEWARE = [
     "wagtail.contrib.redirects.middleware.RedirectMiddleware",
 ]
 
-if not DEBUG:
-    MIDDLEWARE.insert(1, "wagtailcache.cache.UpdateCacheMiddleware")
-    MIDDLEWARE.append("wagtailcache.cache.FetchFromCacheMiddleware")
+# if not DEBUG:
+#     MIDDLEWARE.insert(1, "wagtailcache.cache.UpdateCacheMiddleware")
+#     MIDDLEWARE.append("wagtailcache.cache.FetchFromCacheMiddleware")
 
 ROOT_URLCONF = "config.urls"
 
@@ -94,7 +87,7 @@ TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
         "DIRS": [
-            os.path.join(BASE_DIR, 'templates'),
+            os.path.join(BASE_DIR, "templates"),
         ],
         "APP_DIRS": True,
         "OPTIONS": {
@@ -159,7 +152,15 @@ STATICFILES_DIRS = [
     os.path.join(BASE_DIR, "apps/frontend/build"),
 ]
 
-STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
+STORAGES = {
+    "default": {
+        "BACKEND": "django.core.files.storage.FileSystemStorage",
+    },
+    "staticfiles": {
+        # "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
+        "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
+    },
+}
 
 STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
 STATIC_URL = "/static/"
@@ -190,25 +191,24 @@ WAGTAIL_CACHE = True
 WAGTAIL_CACHE_BACKEND = "default"
 
 # Cache settings
-if DEBUG:
-    CACHES = {
-        "default": {
-            "BACKEND": "django.core.cache.backends.dummy.DummyCache",
-        }
+# if DEBUG:
+CACHES = {
+    "default": {
+        "BACKEND": "django.core.cache.backends.dummy.DummyCache",
     }
-else:
-    CACHES = {
-        "default": {
-            "BACKEND": "django_redis.cache.RedisCache",
-            "LOCATION": "redis://127.0.0.1:6379/1",
-            "OPTIONS": {
-                "CLIENT_CLASS": "django_redis.client.DefaultClient",
-            },
-        }
-    }
+}
+# else:
+#     CACHES = {
+#         "default": {
+#             "BACKEND": "django_redis.cache.RedisCache",
+#             "LOCATION": "redis://127.0.0.1:6379/1",
+#             "OPTIONS": {
+#                 "CLIENT_CLASS": "django_redis.client.DefaultClient",
+#             },
+#         }
+#     }
 
 # Webpack loader settings
 WEBPACK_LOADER = {
-    'MANIFEST_FILE': os.path.join(BASE_DIR, "apps/frontend/build/manifest.json"),
+    "MANIFEST_FILE": os.path.join(BASE_DIR, "apps/frontend/build/manifest.json"),
 }
-
