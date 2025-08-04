@@ -17,7 +17,7 @@ frontend-install:
 	cd apps/frontend/static_src && bun --bun install
 
 frontend-build: # uses node 22 (bun doesn't work with webpack yet)
-	cd apps/frontend/static_src && bun run build 
+	cd apps/frontend/static_src && rm -r ../build && bun run build 
 
 frontend-dev:
-	cd apps/frontend/static_src && bun run dev
+	cd apps/frontend/static_src && rm -r ../build && bun run dev

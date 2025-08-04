@@ -12,14 +12,14 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = "django-insecure-##ky49$0277*m)j0t7mw&sz-+#1hd7l@kks_)(ex8#mi8d$8t="
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 ALLOWED_HOSTS = ["*"]
 
 
 INSTALLED_APPS = [
     # whitenoise dev not static
-    # "whitenoise.runserver_nostatic",
+    "whitenoise.runserver_nostatic",
     # Django apps
     "django.contrib.admin",
     "django.contrib.auth",
