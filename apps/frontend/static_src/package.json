@@ -2,10 +2,10 @@
   "name": "wagtail-starter-kit-frontend",
   "version": "1.0.0",
   "description": "Frontend assets for Wagtail Starter Kit",
-  "main": "src/main.js",
+  "main": "src/app/main.js",
   "scripts": {
-    "build": "webpack --mode production",
-    "dev": "webpack --mode development --watch --config ./webpack.dev.js"
+    "build": "cross-env NODE_ENV=production webpack --mode production",
+    "dev": "cross-env NODE_ENV=development webpack --mode development --watch --config ./webpack.dev.js"
   },
   "keywords": [
     "wagtail",
@@ -16,25 +16,25 @@
   "author": "Wagtail Starter Kit",
   "license": "MIT",
   "dependencies": {
-    "@hotwired/stimulus": "^3.0.0",
-    "@tailwindcss/postcss": "^4.1.11",
+    "@hotwired/stimulus": "^3.2.2",
     "htmx.org": "^2.0.6"
   },
   "devDependencies": {
     "@swc/core": "^1.13.3",
-    "autoprefixer": "^10.4.0",
+    "@tailwindcss/postcss": "^4.1.11",
+    "autoprefixer": "^10.4.21",
     "clean-webpack-plugin": "^4.0.0",
-    "cross-env": "^7.0.3",
+    "cross-env": "^10.0.0",
     "css-loader": "^7.1.2",
     "daisyui": "^5.0.50",
-    "mini-css-extract-plugin": "^2.0.0",
+    "mini-css-extract-plugin": "^2.9.3",
     "postcss": "^8.5.6",
-    "postcss-loader": "^7.0.0",
+    "postcss-loader": "^8.1.1",
     "swc-loader": "^0.2.6",
     "tailwindcss": "^4.1.11",
-    "webpack": "^5.0.0",
-    "webpack-assets-manifest": "^5.2.1",
-    "webpack-cli": "^5.0.0",
+    "webpack": "^5.101.0",
+    "webpack-assets-manifest": "^6.2.2",
+    "webpack-cli": "^6.0.1",
     "webpack-merge": "^6.0.1"
   }
 }
