@@ -4,7 +4,7 @@ from wagtail.admin.panels import FieldPanel
 from wagtailseo.models import SeoMixin
 
 
-class BasePage(SeoMixin):
+class BasePage(SeoMixin, Page):
     """
     Abstract base page model that defines common fields and
     functionality that should be shared across all page types.
