@@ -5,6 +5,20 @@ MAKEFLAGS += -j4
 # runs django and frontend dev servers parallelly 
 dev: django-dev frontend-dev
 
+### cleans up the build artifacts and virtual environment
+.PHONY: clean clean-venv clean-frontend-build clean-frontend-node-modules
+clean: clean-frontend-build clean-venv clean-frontend-node-modules
+
+clean-venv:
+	rm -r .venv
+
+clean-frontend-build:
+	cd apps/frontend && rm -r ./build
+
+clean-frontend-node-modules:
+	cd apps/frontend/static_src && rm -r node_modules
+
+### installs the virtual environment and dependencies
 install: django-install frontend-install
 
 django-install:
