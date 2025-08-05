@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% load wagtailcore_tags %}
+
+{% block content %}
+<div id="form-container" class="container mx-auto px-4 py-8">
+    <h1 class="text-3xl font-bold mb-6">{{ page.title }}</h1>
+    
+    {% if page.intro %}
+        <div class="prose prose-lg mb-8">
+            {{ page.intro|richtext }}
+        </div>
+    {% endif %}
+    
+    <form
+        hx-post="{% pageurl page %}"
+        hx-target="#form-container"
+        hx-swap="outerHTML"
+        class="space-y-6"
+    >
+        {% csrf_token %}
+        
+        {% for field in form %}
+            <div class="form-control">
+                <label for="{{ field.id_for_label }}" class="label">
+                    <span class="label-text text-lg font-medium">
+                        {{ field.label }}
+                        {% if field.field.required %}<span class="text-red-500 ml-1">*</span>{% endif %}
+                    </span>
+                </label>
+                
+                {{ field }}
+                
+                {% if field.help_text %}
+                    <div class="label">
+                        <span class="label-text-alt text-gray-500">{{ field.help_text }}</span>
+                    </div>
+                {% endif %}
+                
+                {% for error in field.errors %}
+                    <div class="label">
+                        <span class="label-text-alt text-error">{{ error }}</span>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endfor %}
+        
+        <button type="submit" class="btn btn-primary mt-4">
+            Submit
+        </button>
+    </form>
+</div>
+{% endblock %}

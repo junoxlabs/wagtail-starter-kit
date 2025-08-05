@@ -219,5 +219,38 @@ class BaseStreamBlock(blocks.StreamBlock):
     three_column = ThreeColumnBlock()
     hero = HeroBlock()
     
+    # Form fields
+    text_field = blocks.StructBlock([
+        ('label', blocks.CharBlock(required=True)),
+        ('required', blocks.BooleanBlock(required=False, default=False)),
+    ], icon='form')
+    
+    email_field = blocks.StructBlock([
+        ('label', blocks.CharBlock(required=True)),
+        ('required', blocks.BooleanBlock(required=False, default=True)),
+    ], icon='mail')
+    
+    textarea_field = blocks.StructBlock([
+        ('label', blocks.CharBlock(required=True)),
+        ('required', blocks.BooleanBlock(required=False, default=False)),
+    ], icon='edit')
+    
+    dropdown_field = blocks.StructBlock([
+        ('label', blocks.CharBlock(required=True)),
+        ('options', blocks.ListBlock(blocks.CharBlock())),
+        ('required', blocks.BooleanBlock(required=False, default=False)),
+    ], icon='arrow-down-big')
+    
+    checkbox_field = blocks.StructBlock([
+        ('label', blocks.CharBlock(required=True)),
+        ('required', blocks.BooleanBlock(required=False, default=False)),
+    ], icon='tick')
+    
+    radio_field = blocks.StructBlock([
+        ('label', blocks.CharBlock(required=True)),
+        ('options', blocks.ListBlock(blocks.CharBlock())),
+        ('required', blocks.BooleanBlock(required=False, default=False)),
+    ], icon='radio-full')
+    
     class Meta:
         required = False

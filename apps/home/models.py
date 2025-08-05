@@ -51,3 +51,31 @@ class HomePage(BasePage):
     class Meta:
         verbose_name = "Home Page"
         verbose_name_plural = "Home Pages"
+
+
+class StandardPage(BasePage):
+    """
+    StandardPage model that inherits from BasePage.
+    Used for regular content pages with flexible body content.
+    """
+    
+    # Main content area as a StreamField for flexible content
+    body = StreamField([
+        ('heading', blocks.CharBlock(form_classname="full title")),
+        ('paragraph', blocks.RichTextBlock()),
+        ('image', ImageChooserBlock()),
+    ], use_json_field=True, blank=True)
+    
+    content_panels = BasePage.content_panels + [
+        FieldPanel('body'),
+    ]
+    
+    promote_panels = BasePage.promote_panels
+    settings_panels = BasePage.settings_panels
+    
+    # Specify the template for this page
+    template = "pages/standard_page.html"
+    
+    class Meta:
+        verbose_name = "Standard Page"
+        verbose_name_plural = "Standard Pages"

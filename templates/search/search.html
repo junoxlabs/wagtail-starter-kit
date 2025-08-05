@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+{% load wagtailcore_tags wagtailimages_tags %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+    <h1 class="text-3xl font-bold mb-6">Search</h1>
+    
+    <form action="{% url 'search:search' %}" method="get" class="mb-8">
+        <div class="flex">
+            <input type="text" name="query" placeholder="Enter your search term..." 
+                   value="{{ search_query }}" 
+                   class="input input-bordered flex-grow mr-2">
+            <button type="submit" class="btn btn-primary">Search</button>
+        </div>
+    </form>
+
+    {% if search_query %}
+        <h2 class="text-2xl font-semibold mb-4">
+            Search results for "{{ search_query }}"
+        </h2>
+        
+        {% if search_results %}
+            <div class="space-y-6">
+                {% for result in search_results %}
+                    <div class="card bg-base-100 shadow-xl">
+                        <div class="card-body">
+                            <h3 class="card-title">
+                                <a href="{% pageurl result %}" class="link link-hover">
+                                    {{ result.title }}
+                                </a>
+                            </h3>
+                            {% if result.search_description %}
+                                <p>{{ result.search_description }}</p>
+                            {% endif %}
+                            <div class="card-actions justify-end">
+                                <a href="{% pageurl result %}" class="btn btn-outline btn-primary">
+                                    Read more
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+            
+            <!-- Pagination -->
+            {% if search_results.has_other_pages %}
+                <div class="flex justify-center mt-8">
+                    <div class="join">
+                        {% if search_results.has_previous %}
+                            <a href="?query={{ search_query }}&page={{ search_results.previous_page_number }}" 
+                               class="join-item btn btn-outline">
+                                Previous
+                            </a>
+                        {% endif %}
+                        
+                        {% for page_num in search_results.paginator.page_range %}
+                            {% if search_results.number == page_num %}
+                                <button class="join-item btn btn-active">
+                                    {{ page_num }}
+                                </button>
+                            {% else %}
+                                <a href="?query={{ search_query }}&page={{ page_num }}" 
+                                   class="join-item btn btn-outline">
+                                    {{ page_num }}
+                                </a>
+                            {% endif %}
+                        {% endfor %}
+                        
+                        {% if search_results.has_next %}
+                            <a href="?query={{ search_query }}&page={{ search_results.next_page_number }}" 
+                               class="join-item btn btn-outline">
+                                Next
+                            </a>
+                        {% endif %}
+                    </div>
+                </div>
+            {% endif %}
+        {% else %}
+            <p>No results found for "{{ search_query }}".</p>
+        {% endif %}
+    {% else %}
+        <p>Please enter a search term above.</p>
+    {% endif %}
+</div>
+{% endblock %}

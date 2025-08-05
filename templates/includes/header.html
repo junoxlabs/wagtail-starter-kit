@@ -8,9 +8,16 @@
                     <a href="/">Wagtail Starter Kit</a>
                 </h1>
             </div>
-            <nav class="navigation">
-                {% include "includes/navigation.html" %}
-            </nav>
+            <div class="flex items-center space-x-4">
+                <nav class="navigation">
+                    {% include "includes/navigation.html" %}
+                </nav>
+                <form action="{% url 'search:search' %}" method="get" class="flex">
+                    <input type="text" name="query" placeholder="Search..."
+                           class="input input-sm input-bordered">
+                    <button type="submit" class="btn btn-sm btn-primary ml-2">Go</button>
+                </form>
+            </div>
         </div>
     </div>
 </header>
