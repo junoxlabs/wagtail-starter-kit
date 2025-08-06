@@ -1,5 +1,6 @@
 from django.db import models
-from wagtail.admin.panels import FieldPanel
+from modelcluster.fields import ParentalKey
+from wagtail.admin.panels import FieldPanel, InlinePanel
 from wagtail.contrib.forms.models import AbstractEmailForm, AbstractFormField
 from wagtail.fields import StreamField
 from wagtail.models import Page
@@ -10,9 +11,7 @@ from apps.blocks.models import BaseStreamBlock
 
 
 class FormField(AbstractFormField):
-    page = models.ForeignKey(
-        "FormPage", on_delete=models.CASCADE, related_name="form_fields"
-    )
+    page = ParentalKey("FormPage", on_delete=models.CASCADE, related_name="form_fields")
 
 
 class FormPage(BasePage, AbstractEmailForm):
@@ -26,16 +25,9 @@ class FormPage(BasePage, AbstractEmailForm):
         blank=True, help_text="Text to display after form submission"
     )
 
-    form_fields_streamblock = StreamField(
-        BaseStreamBlock(),
-        use_json_field=True,
-        blank=True,
-        help_text="Build your form by adding form fields",
-    )
-
     content_panels = Page.content_panels + [
         FieldPanel("intro"),
-        FieldPanel("form_fields_streamblock"),
+        InlinePanel("form_fields", label="Form fields"),
         FieldPanel("thank_you_text"),
         FieldPanel("to_address"),
         FieldPanel("from_address"),
@@ -43,14 +35,14 @@ class FormPage(BasePage, AbstractEmailForm):
     ]
 
     def get_form_fields(self):
-        return self.form_fields_streamblock
+        return self.form_fields.all()
 
     def get_data_fields(self):
         data_fields = [
             ("submit_time", "Submission date"),
         ]
         for field in self.get_form_fields():
-            data_fields.append((field.block.name, field.value.get("label")))
+            data_fields.append((field.clean_name, field.label))
         return data_fields
 
     def get_url_parts(self, *args, **kwargs):
