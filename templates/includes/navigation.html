@@ -1,7 +1,12 @@
 {% load wagtailcore_tags %}
 
-<ul class="flex space-x-6">
-    <li><a href="/" class="hover:text-primary">Home</a></li>
-    <li><a href="{% url 'search:search' %}" class="hover:text-primary">Search</a></li>
-    <!-- Add more navigation items here -->
-</ul>
+{% load wagtailcore_tags %}
+{% load wagtailroutablepage_tags %}
+
+{% with menu=snippets.Menu.objects.filter(slug="main-menu").first %}
+    {% if menu %}
+        {% include "navigation/menu.html" with self=menu %}
+    {% else %}
+        <p>No main menu found.</p>
+    {% endif %}
+{% endwith %}

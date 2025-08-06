@@ -6,7 +6,6 @@ from modelcluster.fields import ParentalKey
 from modelcluster.models import ClusterableModel
 
 
-@register_snippet
 class MenuItem(Orderable):
     """
     Menu item snippet that can be used to create navigation menus.

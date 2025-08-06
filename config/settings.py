@@ -59,10 +59,11 @@ INSTALLED_APPS = [
     "apps.home",
     "apps.frontend",
     "apps.blocks",
-    "apps.navigation",
-    "apps.seo",
+    "apps.navigation.apps.NavigationConfig",
+    "apps.settings",
     "apps.search",
     "apps.forms",
+    "apps.snippets",
 ]
 
 MIDDLEWARE = [

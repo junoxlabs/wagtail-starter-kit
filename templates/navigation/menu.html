@@ -1,0 +1,11 @@
+<nav class="bg-gray-800 p-4">
+  <ul class="flex">
+    {% for menu_item in self.menu_items.all %}
+      <li class="inline-block mr-6">
+        <a href="{{ menu_item.link }}" class="text-white hover:text-gray-300 px-3 py-2 rounded-md text-sm font-medium">
+          {{ menu_item.title }}
+        </a>
+      </li>
+    {% endfor %}
+  </ul>
+</nav>
