@@ -2,12 +2,10 @@ from django.db import models
 from modelcluster.fields import ParentalKey
 from wagtail.admin.panels import FieldPanel, InlinePanel
 from wagtail.contrib.forms.models import AbstractEmailForm, AbstractFormField
-from wagtail.fields import StreamField
 from wagtail.models import Page
 import uuid6
 
 from apps.core.models import BasePage
-from apps.blocks.models import BaseStreamBlock
 
 
 class FormField(AbstractFormField):
@@ -54,17 +52,5 @@ class FormPage(BasePage, AbstractEmailForm):
             return None
 
         # Replace the page ID with the UUID
-        url_parts = list(url_parts)
-        url_parts[1] = self.uuid.hex
-        return url_parts
-
-    @classmethod
-    def get_page_from_path(cls, path):
-        """
-        Override get_page_from_path to resolve pages by UUID.
-        """
-        try:
-            uuid_obj = uuid6.UUID(path.strip("/"))
-            return cls.objects.get(uuid=uuid_obj)
-        except (ValueError, cls.DoesNotExist):
-            return None
+        site_id, root_url, page_path = url_parts
+        return (site_id, root_url, f"/{self.uuid.hex}/{page_path}")
