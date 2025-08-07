@@ -52,6 +52,7 @@ INSTALLED_APPS = [
     "wagtailcache",
     # Forms
     "wagtail_flexible_forms",
+    "django_htmx",
     # Webpack integration
     "webpack_boilerplate",
     # Our apps
@@ -71,6 +72,7 @@ MIDDLEWARE = [
     "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
+    "django_htmx.middleware.HtmxMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",

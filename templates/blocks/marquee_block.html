@@ -1,0 +1,11 @@
+{% load wagtailcore_tags %}
+
+<div class="marquee">
+    <div class="marquee-content">
+        {% for item in self.items %}
+            <div class="marquee-item">
+                {% include_block item %}
+            </div>
+        {% endfor %}
+    </div>
+</div>

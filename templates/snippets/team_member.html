@@ -1,0 +1,13 @@
+{% load wagtailimages_tags %}
+
+<div class="team-member flex flex-col items-center text-center">
+    {% if team_member.photo %}
+        <div class="team-member-photo mb-4">
+            {% image team_member.photo fill-200x200 class="rounded-full" %}
+        </div>
+    {% endif %}
+    <div class="team-member-info">
+        <h3 class="team-member-name font-semibold text-lg">{{ team_member.name }}</h3>
+        <p class="team-member-role text-gray-600">{{ team_member.role }}</p>
+    </div>
+</div>

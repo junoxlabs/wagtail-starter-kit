@@ -1,0 +1,13 @@
+{% load wagtailimages_tags %}
+
+<div class="testimonial-block">
+    <blockquote>
+        {{ self.testimonial.quote }}
+    </blockquote>
+    <cite>
+        {% if self.testimonial.image %}
+            {% image self.testimonial.image fill-50x50 %}
+        {% endif %}
+        {{ self.testimonial.author }}
+    </cite>
+</div>

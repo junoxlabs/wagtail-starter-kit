@@ -17,6 +17,7 @@ dependencies = [
     "pillow>=10.4.0",
     "psycopg[binary]>=3.2.1",
     "uuid6>=2025.0.1",
+    "django-htmx>=1.23.2",
 ]
 
 [tool.uv]

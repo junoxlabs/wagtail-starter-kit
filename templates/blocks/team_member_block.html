@@ -1,0 +1,8 @@
+{% raw %}{% load wagtailimages_tags %}
+
+<div class="team-member-block">
+    {% image self.team_member.photo fill-150x150 as photo %}
+    <img src="{{ photo.url }}" alt="{{ self.team_member.name }}" />
+    <h3>{{ self.team_member.name }}</h3>
+    <p>{{ self.team_member.role }}</p>
+</div>{% endraw %}

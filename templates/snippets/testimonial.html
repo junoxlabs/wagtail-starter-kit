@@ -1,0 +1,17 @@
+{% load wagtailimages_tags %}
+
+<div class="testimonial bg-white p-6 rounded-lg shadow-md">
+    <div class="testimonial-content">
+        <p class="testimonial-quote text-gray-700 italic mb-4">"{{ testimonial.quote }}"</p>
+        <div class="testimonial-author flex items-center">
+            {% if testimonial.image %}
+                <div class="testimonial-image mr-4">
+                    {% image testimonial.image fill-100x100 class="rounded-full" %}
+                </div>
+            {% endif %}
+            <div class="testimonial-author-info">
+                <p class="testimonial-author-name font-semibold">{{ testimonial.author }}</p>
+            </div>
+        </div>
+    </div>
+</div>

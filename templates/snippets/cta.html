@@ -1,0 +1,25 @@
+<div class="cta-snippet">
+    {% if self.header_script %}
+        <div class="header-script">
+            {{ self.header_script|safe }}
+        </div>
+    {% endif %}
+
+    <div class="cta-content bg-gray-50 p-6 rounded-lg shadow-sm">
+        <h3 class="text-xl font-bold text-gray-900">{{ self.title }}</h3>
+        {% if self.description %}
+            <div class="text-gray-700 mt-2">{{ self.description|richtext }}</div>
+        {% endif %}
+        {% if self.button_text and self.button_url %}
+            <a href="{{ self.button_url }}" class="inline-block mt-4 px-6 py-2 bg-blue-600 text-white font-medium rounded-md hover:bg-blue-700 transition-colors">
+                {{ self.button_text }}
+            </a>
+        {% endif %}
+    </div>
+
+    {% if self.footer_script %}
+        <div class="footer-script">
+            {{ self.footer_script|safe }}
+        </div>
+    {% endif %}
+</div>

@@ -5,6 +5,7 @@ from wagtail.admin.panels import FieldPanel
 from wagtail.images.blocks import ImageChooserBlock
 
 from apps.core.models import BasePage
+from apps.blocks.models import ContentStreamBlock
 
 
 class HomePage(BasePage):
@@ -12,14 +13,13 @@ class HomePage(BasePage):
     HomePage model that inherits from BasePage.
     This is the main entry point for the website.
     """
-    
+
     # Main content area as a StreamField for flexible content
-    body = StreamField([
-        ('heading', blocks.CharBlock(form_classname="full title")),
-        ('paragraph', blocks.RichTextBlock()),
-        ('image', ImageChooserBlock()),
-        # Add more blocks as needed for the homepage
-    ], use_json_field=True, blank=True)
+    body = StreamField(
+        ContentStreamBlock(),
+        use_json_field=True,
+        blank=True,
+    )
     
     # Additional fields specific to the homepage
     banner_title = models.CharField(max_length=255, blank=True, null=True)
@@ -60,11 +60,11 @@ class StandardPage(BasePage):
     """
     
     # Main content area as a StreamField for flexible content
-    body = StreamField([
-        ('heading', blocks.CharBlock(form_classname="full title")),
-        ('paragraph', blocks.RichTextBlock()),
-        ('image', ImageChooserBlock()),
-    ], use_json_field=True, blank=True)
+    body = StreamField(
+        ContentStreamBlock(),
+        use_json_field=True,
+        blank=True,
+    )
     
     content_panels = BasePage.content_panels + [
         FieldPanel('body'),

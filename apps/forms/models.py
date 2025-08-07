@@ -1,56 +1,97 @@
 from django.db import models
+from django.core.mail import send_mail
+from django.template.response import TemplateResponse
 from modelcluster.fields import ParentalKey
-from wagtail.admin.panels import FieldPanel, InlinePanel
-from wagtail.contrib.forms.models import AbstractEmailForm, AbstractFormField
+from wagtail.admin.panels import FieldPanel
+from wagtail.fields import StreamField
 from wagtail.models import Page
-import uuid6
+from wagtail_flexible_forms.models import (
+    StreamFormMixin,
+    AbstractSessionFormSubmission,
+    AbstractSubmissionRevision,
+)
 
 from apps.core.models import BasePage
+from apps.blocks.models import ContentStreamBlock
+from wagtail_flexible_forms.blocks import FormFieldsBlock
 
 
-class FormField(AbstractFormField):
-    page = ParentalKey("FormPage", on_delete=models.CASCADE, related_name="form_fields")
+class SubmissionRevision(AbstractSubmissionRevision):
+    pass
 
 
-class FormPage(BasePage, AbstractEmailForm):
+class FormSubmission(AbstractSessionFormSubmission):
+    page = ParentalKey(
+        "FormPage", on_delete=models.CASCADE, related_name="form_submissions"
+    )
+
+    @staticmethod
+    def get_revision_class():
+        return SubmissionRevision
+
+
+class FormPage(StreamFormMixin, BasePage):
     template = "pages/form_page.html"
     landing_page_template = "pages/form_page_landing.html"
     subpage_types = []
 
-    uuid = models.UUIDField(default=uuid6.uuid7, editable=False, unique=True)
-    intro = models.TextField(blank=True, help_text="Introduction text for the form")
+    body = StreamField(
+        ContentStreamBlock(),
+        use_json_field=True,
+        blank=True,
+    )
     thank_you_text = models.TextField(
         blank=True, help_text="Text to display after form submission"
     )
+    form_fields = StreamField(
+        FormFieldsBlock(),
+        use_json_field=True,
+        blank=True,
+    )
+    to_address = models.CharField(
+        max_length=255,
+        blank=True,
+        help_text="Optional - email address to send submissions to",
+    )
+    from_address = models.CharField(max_length=255, blank=True)
+    subject = models.CharField(max_length=255, blank=True)
 
-    content_panels = Page.content_panels + [
-        FieldPanel("intro"),
-        InlinePanel("form_fields", label="Form fields"),
+    content_panels = BasePage.content_panels + [
+        FieldPanel("body"),
+        FieldPanel("form_fields"),
         FieldPanel("thank_you_text"),
         FieldPanel("to_address"),
         FieldPanel("from_address"),
         FieldPanel("subject"),
     ]
 
-    def get_form_fields(self):
-        return self.form_fields.all()
+    def get_session_submission_class(self):
+        return FormSubmission
 
-    def get_data_fields(self):
-        data_fields = [
-            ("submit_time", "Submission date"),
-        ]
-        for field in self.get_form_fields():
-            data_fields.append((field.clean_name, field.label))
-        return data_fields
+    def get_context(self, request, *args, **kwargs):
+        context = super().get_context(request, *args, **kwargs)
+        if request.htmx:
+            context["base_template"] = "_partial.html"
+        else:
+            context["base_template"] = "base.html"
+        return context
 
-    def get_url_parts(self, *args, **kwargs):
-        """
-        Override the get_url_parts method to use the UUID in the URL.
-        """
-        url_parts = super().get_url_parts(*args, **kwargs)
-        if url_parts is None:
-            return None
+    def process_form_submission(self, form):
+        submission = self.get_submission_class().objects.create(
+            form_data=form.cleaned_data,
+            page=self,
+        )
+        if self.to_address:
+            self.send_mail(form)
+        return submission
 
-        # Replace the page ID with the UUID
-        site_id, root_url, page_path = url_parts
-        return (site_id, root_url, f"/{self.uuid.hex}/{page_path}")
+    def send_mail(self, form):
+        addresses = [x.strip() for x in self.to_address.split(",")]
+        content = []
+        for field in form:
+            value = field.value()
+            if isinstance(value, list):
+                value = ", ".join(value)
+            content.append(f"{field.label}: {value}")
+        content = "\n".join(content)
+        send_mail(self.subject, content, self.from_address, addresses)
