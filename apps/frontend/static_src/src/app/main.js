@@ -4,10 +4,12 @@ import "../css/styles.css";
 // Import HTMX
 import "htmx.org";
 
+// Import GSAP
+import { gsap } from "gsap";
+
 // Import Stimulus
 import { Application } from "@hotwired/stimulus";
-
-// Create a global Stimulus application
+// Initialize Stimulus
 window.Stimulus = Application.start();
 
 // You can add your custom JavaScript here
