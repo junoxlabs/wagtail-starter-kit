@@ -1,3 +1,4 @@
+import uuid
 from django.db import models
 from wagtail.models import Page
 from wagtail.admin.panels import FieldPanel
@@ -10,6 +11,9 @@ class BasePage(SeoMixin, Page):
     functionality that should be shared across all page types.
     Inherits from SeoMixin to provide SEO functionality via wagtail-seo.
     """
+
+    # Add a UUID field to provide a stable identifier for all page types
+    uuid = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
 
     # Make this an abstract model
     class Meta:
