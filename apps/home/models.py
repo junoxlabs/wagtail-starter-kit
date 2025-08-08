@@ -1,17 +1,13 @@
-from django.db import models
 from wagtail.fields import StreamField
-from wagtail import blocks
 from wagtail.admin.panels import FieldPanel
-from wagtail.images.blocks import ImageChooserBlock
-
 from apps.core.models import BasePage
 from apps.blocks.models import ContentStreamBlock
 
 
-class HomePage(BasePage):
+class FlexPage(BasePage):
     """
-    HomePage model that inherits from BasePage.
-    This is the main entry point for the website.
+    A flexible page model that can be used for the homepage or other standard pages.
+    It uses a StreamField for maximum content flexibility.
     """
 
     # Main content area as a StreamField for flexible content
@@ -20,62 +16,20 @@ class HomePage(BasePage):
         use_json_field=True,
         blank=True,
     )
-    
-    # Additional fields specific to the homepage
-    banner_title = models.CharField(max_length=255, blank=True, null=True)
-    banner_subtitle = models.CharField(max_length=255, blank=True, null=True)
-    banner_image = models.ForeignKey(
-        'wagtailimages.Image',
-        null=True,
-        blank=True,
-        on_delete=models.SET_NULL,
-        related_name='+'
-    )
-    
+
     content_panels = BasePage.content_panels + [
-        FieldPanel('banner_title'),
-        FieldPanel('banner_subtitle'),
-        FieldPanel('banner_image'),
-        FieldPanel('body'),
+        FieldPanel("body"),
     ]
-    
+
     promote_panels = BasePage.promote_panels
     settings_panels = BasePage.settings_panels
-    
-    # Allow only one homepage to be created
-    max_count = 1
-    
-    # Specify the template for this page
-    template = "pages/home_page.html"
-    
-    class Meta:
-        verbose_name = "Home Page"
-        verbose_name_plural = "Home Pages"
 
+    # Allow only one instance at the root level
+    parent_page_types = ["wagtailcore.Page", "home.FlexPage"]
 
-class StandardPage(BasePage):
-    """
-    StandardPage model that inherits from BasePage.
-    Used for regular content pages with flexible body content.
-    """
-    
-    # Main content area as a StreamField for flexible content
-    body = StreamField(
-        ContentStreamBlock(),
-        use_json_field=True,
-        blank=True,
-    )
-    
-    content_panels = BasePage.content_panels + [
-        FieldPanel('body'),
-    ]
-    
-    promote_panels = BasePage.promote_panels
-    settings_panels = BasePage.settings_panels
-    
     # Specify the template for this page
-    template = "pages/standard_page.html"
-    
+    template = "pages/flex_page.html"
+
     class Meta:
-        verbose_name = "Standard Page"
-        verbose_name_plural = "Standard Pages"
+        verbose_name = "Flex Page"
+        verbose_name_plural = "Flex Pages"
