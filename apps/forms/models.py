@@ -1,26 +1,34 @@
 from django.db import models
 from django.core.mail import send_mail
-from django.template.response import TemplateResponse
 from modelcluster.fields import ParentalKey
 from wagtail.admin.panels import FieldPanel
 from wagtail.fields import StreamField
-from wagtail.models import Page
 from wagtail_flexible_forms.models import (
     StreamFormMixin,
     AbstractSessionFormSubmission,
     AbstractSubmissionRevision,
 )
-
 from apps.core.models import BasePage
 from apps.blocks.models import ContentStreamBlock
 from wagtail_flexible_forms.blocks import FormFieldsBlock
 
 
 class SubmissionRevision(AbstractSubmissionRevision):
+    """
+    SubmissionRevision is used to track changes to form submissions.
+    It can be extended to add custom fields or methods if needed.
+    """
+
     pass
 
 
 class FormSubmission(AbstractSessionFormSubmission):
+    """
+    FormSubmission is used to store the data submitted through a form page.
+    It inherits from AbstractSessionFormSubmission to leverage session management
+    and can be extended with additional fields or methods as needed.
+    """
+
     page = ParentalKey(
         "FormPage", on_delete=models.CASCADE, related_name="form_submissions"
     )
@@ -31,6 +39,12 @@ class FormSubmission(AbstractSessionFormSubmission):
 
 
 class FormPage(StreamFormMixin, BasePage):
+    """
+    FormPage is a Wagtail page that allows users to create and manage forms.
+    It extends StreamFormMixin to provide form functionality and uses
+    BasePage for common page features.
+    """
+
     template = "pages/form_page.html"
     landing_page_template = "pages/form_page_landing.html"
     subpage_types = []
@@ -67,6 +81,13 @@ class FormPage(StreamFormMixin, BasePage):
 
     def get_session_submission_class(self):
         return FormSubmission
+
+    def get_session_submission(self, request):
+        # Return None if the page is not yet saved (e.g., in preview)
+        # to prevent a ValueError.
+        if not self.pk:
+            return None
+        return super().get_session_submission(request)
 
     def get_context(self, request, *args, **kwargs):
         context = super().get_context(request, *args, **kwargs)
