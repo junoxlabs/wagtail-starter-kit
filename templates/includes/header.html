@@ -1,38 +1,88 @@
 {% load static wagtailcore_tags navigation_tags %}
 
-<header class="bg-base-300 py-4">
-    <div class="container mx-auto px-4">
-        <div class="flex justify-between items-center">
-            <div class="logo">
-                <h1 class="text-2xl font-bold">
-                    <a href="/">Wagtail Starter Kit</a>
-                </h1>
-            </div>
-            
-            <!-- Navigation Menu -->
+<!-- header / navigation Menu -->
+<header class="bg-base-300 shadow-sm relative">
+    <div class="navbar container mx-auto" data-controller="navbar">
+        <div class="navbar-start">
+            <h1 class="text-xl font-bold">
+                <a href="/">Wagtail Starter Kit</a>
+            </h1>
+        </div>
+
+        {% get_menu "main-menu" as navigation %}
+
+        <!-- desktop menu -->
+        <div class="navbar-end hidden lg:flex">
             <nav>
-                {% get_menu "main-menu" as navigation %}
                 {% if navigation %}
-                <ul class="flex space-x-4">
+                <ul class="menu menu-horizontal px-1">
                     {% for item in navigation.menu_items.all %}
-                    <li>
-                        <a href="{{ item.link }}"
-                           {% if item.open_in_new_tab %}target="_blank"{% endif %}>
-                            {{ item.title }}
-                        </a>
-                    </li>
-                    {% endfor %}
-                </ul>
+                        <li>
+                            <a
+                                href="{{ item.link }}"
+                                class="normal-case"
+                            {% if item.open_in_new_tab %}
+                                target="_blank"
+                            {% endif %}
+                            >
+                                {{ item.title }}
+                            </a>
+                        </li>
+                        {% endfor %}
+                    </ul>
                 {% endif %}
             </nav>
-            
-            <div class="flex items-center space-x-4">
+
+            {% comment %} ! TODO: implement spotlight like searchbar w/ dropdown {% endcomment %}
+            {% comment %} <div class="flex items-center space-x-4">
                 <form action="{% url 'search:search' %}" method="get" class="flex">
-                    <input type="text" name="query" placeholder="Search..."
-                           class="input input-sm input-bordered">
+                    <input type="text" name="query" placeholder="Search..." class="input input-sm input-bordered">
                     <button type="submit" class="btn btn-sm btn-primary ml-2">Go</button>
                 </form>
-            </div>
+            </div>  {% endcomment %}
         </div>
+        <!-- end desktop menu -->
+
+        <!-- mobile menu -->
+        <ul
+            class="absolute top-full left-0 z-20 w-full min-h-[calc(100vh-4rem)] bg-base-200/80 backdrop-blur-lg shadow-md hidden lg:hidden flex flex-col justify-start items-start"
+            data-navbar-target="mobileMenu"
+        >
+            {% if navigation %}
+            {% for item in navigation.menu_items.all %}
+            <li class="border-b border-base-300/80 w-full">
+                <a href="{{ item.link }}"
+                    {% if item.open_in_new_tab %}
+                        target="_blank"
+                    {% endif %}
+
+                    class="block p-3 normal-case text-bold"
+                    data-action="click->navbar#closeMenu"
+                >
+                    {{ item.title }}
+                </a>
+            </li>
+            {% endfor %}
+            {% endif %}
+        </ul>
+        <!-- end mobile menu -->
+
+        <!-- hamburger menu button -->
+        <div class="navbar-end lg:hidden">
+            {# data-action to trigger Stimulus method #}
+            <button class="btn btn-ghost" data-action="navbar#toggleMenu">
+                {# Hamburger icon: Initially visible, hidden by Stimulus when menu opens #}
+                <svg data-navbar-target="hamburgerIcon" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 block" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                </svg>
+
+                {# Close icon: Initially hidden, shown by Stimulus when menu opens #}
+                <svg data-navbar-target="closeIcon" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </button>
+        </div>
+        <!-- end hamburger menu button -->
+
     </div>
 </header>
