@@ -1,0 +1,27 @@
+# Git
+.git
+.gitignore
+
+# Docker
+.dockerignore
+Dockerfile
+docker-compose.yml
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.venv/
+*.egg-info/
+pip-wheel-metadata/
+
+# Node / Bun
+node_modules/
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
