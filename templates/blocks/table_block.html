@@ -1,0 +1,24 @@
+<div class="overflow-x-auto">
+  <table class="table">
+    {# Table head #}
+    {% if self.table_header %}
+    <thead>
+      <tr>
+        {% for col in self.table_header %}
+        <th scope="col">{{ col }}</th>
+        {% endfor %}
+      </tr>
+    </thead>
+    {% endif %}
+    {# Table body #}
+    <tbody>
+      {% for row in self.table_body %}
+      <tr>
+        {% for cell in row %}
+        <td>{{ cell }}</td>
+        {% endfor %}
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>

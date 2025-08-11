@@ -1,0 +1,18 @@
+{% load wagtailimages_tags %}
+
+<div class="hero min-h-[40vh] bg-base-200">
+  <div class="hero-content flex-col {% if self.image_side == 'right' %}lg:flex-row-reverse{% else %}lg:flex-row{% endif %}">
+    {% image self.image width-500 class="max-w-sm rounded-lg shadow-2xl" %}
+    <div>
+      <h1 class="text-5xl font-bold">{{ self.title }}</h1>
+      {% if self.subtitle %}
+        <p class="py-6">{{ self.subtitle }}</p>
+      {% endif %}
+      {% if self.cta_button_text and self.cta_button_link %}
+        <a href="{{ self.cta_button_link }}" class="btn btn-{{ self.cta_button_style | default:'primary' }}">
+            {{ self.cta_button_text }}
+        </a>
+      {% endif %}
+    </div>
+  </div>
+</div>

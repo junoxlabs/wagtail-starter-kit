@@ -183,6 +183,7 @@ class BaseStreamBlock(blocks.StreamBlock):
     """
     A base StreamBlock that contains all the simple content blocks.
     """
+
     heading = HeadingBlock()
     paragraph = RichTextBlock()
     image = ImageBlock()
@@ -227,9 +228,9 @@ class ThreeColumnBlock(blocks.StructBlock):
         template = "blocks/three_column_block.html"
 
 
-class HeroBlock(blocks.StructBlock):
+class SimpleHeroBlock(blocks.StructBlock):
     """
-    Custom hero block for primary page headers.
+    A simple hero block with a title, subtitle, and background image.
     """
 
     title = blocks.CharBlock(required=True, max_length=100)
@@ -256,13 +257,15 @@ class HeroBlock(blocks.StructBlock):
 
     class Meta:
         icon = "image"
-        template = "blocks/hero_block.html"
+        template = "blocks/simple_hero_block.html"
+        label = "Simple Hero"
 
 
 class SliderBlock(blocks.StructBlock):
     """
     A slider block with a StreamBlock of simple content blocks.
     """
+
     slides = BaseStreamBlock(required=False)
 
     class Meta:
@@ -274,6 +277,7 @@ class MarqueeBlock(blocks.StructBlock):
     """
     A marquee block with a StreamBlock of simple content blocks.
     """
+
     items = BaseStreamBlock(required=False)
 
     class Meta:
@@ -281,12 +285,112 @@ class MarqueeBlock(blocks.StructBlock):
         template = "blocks/marquee_block.html"
 
 
+class TableBlock(blocks.StructBlock):
+    """
+    A custom block for creating tables.
+    It includes an optional header and a list of rows.
+    """
+
+    table_header = blocks.ListBlock(
+        blocks.CharBlock(label="Column"), label="Header row", required=False
+    )
+    table_body = blocks.ListBlock(
+        blocks.ListBlock(blocks.CharBlock(label="Cell")), label="Table rows"
+    )
+
+    class Meta:
+        icon = "table"
+        template = "blocks/table_block.html"
+        label = "Table"
+
+
+class SideBySideHeroBlock(blocks.StructBlock):
+    """
+    A hero block with a side-by-side layout.
+    """
+
+    title = blocks.CharBlock(required=True, max_length=100)
+    subtitle = blocks.CharBlock(required=False, max_length=200)
+    image = ImageChooserBlock(required=True)
+    image_side = blocks.ChoiceBlock(
+        choices=[
+            ("left", "Left"),
+            ("right", "Right"),
+        ],
+        default="left",
+    )
+    cta_button_text = blocks.CharBlock(required=False, max_length=50)
+    cta_button_link = blocks.URLBlock(required=False)
+    cta_button_style = blocks.ChoiceBlock(
+        choices=[
+            ("primary", "Primary"),
+            ("secondary", "Secondary"),
+            ("outline", "Outline"),
+        ],
+        default="primary",
+    )
+
+    class Meta:
+        icon = "image"
+        template = "blocks/side_by_side_hero_block.html"
+        label = "Side-by-Side Hero"
+
+
+class VideoHeroBlock(blocks.StructBlock):
+    """
+    A hero block with a video background.
+    """
+
+    title = blocks.CharBlock(required=True, max_length=100)
+    subtitle = blocks.CharBlock(required=False, max_length=200)
+    video = EmbedBlock(required=True)
+    text_color = blocks.ChoiceBlock(
+        choices=[
+            ("text-white", "White"),
+            ("text-black", "Black"),
+            ("text-gray-800", "Dark Gray"),
+        ],
+        default="text-white",
+    )
+    cta_button_text = blocks.CharBlock(required=False, max_length=50)
+    cta_button_link = blocks.URLBlock(required=False)
+    cta_button_style = blocks.ChoiceBlock(
+        choices=[
+            ("primary", "Primary"),
+            ("secondary", "Secondary"),
+            ("outline", "Outline"),
+        ],
+        default="primary",
+    )
+
+    class Meta:
+        icon = "media"
+        template = "blocks/video_hero_block.html"
+        label = "Video Hero"
+
+
+class HeroBlock(blocks.StreamBlock):
+    """
+    A flexible hero block with multiple hero styles.
+    """
+
+    simple_hero = SimpleHeroBlock()
+    side_by_side_hero = SideBySideHeroBlock()
+    video_hero = VideoHeroBlock()
+
+    class Meta:
+        icon = "image"
+        label = "Hero"
+
+
 class ContentStreamBlock(BaseStreamBlock):
     """
     A StreamBlock for general content, including layout blocks.
     """
+
     two_column = TwoColumnBlock()
     three_column = ThreeColumnBlock()
     hero = HeroBlock()
     slider = SliderBlock()
     marquee = MarqueeBlock()
+    table = TableBlock()
