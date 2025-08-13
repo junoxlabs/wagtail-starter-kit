@@ -1,12 +1,23 @@
 # Stage 1: Frontend Asset Builder
 # Use the official Bun image with the version specified in mise.toml
-FROM oven/bun:1.2 as frontend-builder
+FROM oven/bun:1.2 AS frontend-builder
+
+# Install system packages required by Wagtail and Django.
+RUN apt-get update --yes --quiet && apt-get install --yes --quiet --no-install-recommends \
+    build-essential \
+    make \
+    curl
+
+RUN apt-get install --yes --quiet --no-install-recommends nodejs && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
 
 # Copy the Makefile and frontend source code needed for the build
 COPY Makefile ./
 COPY apps/frontend/static_src/ ./apps/frontend/static_src/
+
+# all the html templates tailwind needs to process
+COPY templates/ ./templates/
 
 # Install frontend dependencies and build assets using the Makefile commands
 RUN make frontend-install
@@ -38,26 +49,27 @@ RUN apt-get update --yes --quiet && apt-get install --yes --quiet --no-install-r
     libwebp-dev \
  && rm -rf /var/lib/apt/lists/*
 
-# Install the project requirements using the copied uv binary.
+ # Use /app folder as a directory where the source code is stored.
+ WORKDIR /app
+
+ # Install the project requirements using the copied uv binary.
 COPY pyproject.toml uv.lock ./
 RUN /uv sync --locked
 
-# Use /app folder as a directory where the source code is stored.
-WORKDIR /app
 
 # Copy the entire application code
 COPY . .
 
 # Copy the compiled static assets from the frontend-builder stage
-COPY --from=frontend-builder /app/apps/frontend/static/ /app/apps/frontend/static/
+COPY --from=frontend-builder /app/apps/frontend/build/ /app/apps/frontend/build/
 
 # Add and use a non-root user for security
-RUN useradd wagtail && chown -R wagtail:wagtail /app
+RUN mkdir -p /home/wagtail && useradd --home-dir /home/wagtail --shell /bin/bash wagtail && chown -R wagtail:wagtail /home/wagtail /app
 USER wagtail
 
 # Collect static files.
-RUN /uv run python manage.py collectstatic --noinput --clear
+RUN mkdir -p /app/.cache && chown wagtail:wagtail /app/.cache && UV_CACHE_DIR=/app/.cache /uv run python manage.py collectstatic --noinput --clear
 
 # Runtime command that executes when "docker run" is called.
-# This is the production command. It will be overridden for development.
-CMD set -xe; /uv run python manage.py migrate --noinput; /uv run gunicorn config.wsgi:application --bind 0.0.0.0:$PORT
+# This is the production command.
+CMD ["/bin/bash", "-c", "set -xe; /uv run python manage.py migrate --noinput; /uv run gunicorn config.wsgi:application --bind 0.0.0.0:$PORT"]
