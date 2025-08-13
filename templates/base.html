@@ -8,6 +8,9 @@
     {# CSS bundle from webpack #}
     {% render_bundle 'main' 'css' %}
 
+    {# JavaScript bundle from webpack #}
+    {% render_bundle 'main' 'js' attrs='defer' %}
+
     {# SEO tags from wagtail-seo #}
     {% if page.seo_title %}
         <title>{{ page.seo_title }}</title>
@@ -80,8 +83,5 @@
 
     {# Site footer #}
     {% include "includes/footer.html" %}
-
-    {# JavaScript bundle from webpack #}
-    {% render_bundle 'main' 'js' attrs='defer' %}
 </body>
 </html>
