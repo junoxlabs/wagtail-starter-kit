@@ -33,8 +33,6 @@ DEBUG = env("DEBUG")
 
 
 INSTALLED_APPS = [
-    # whitenoise dev not static
-    "whitenoise.runserver_nostatic",
     # Django apps
     "django.contrib.admin",
     "django.contrib.auth",
@@ -68,8 +66,9 @@ INSTALLED_APPS = [
     # Forms
     "wagtail_flexible_forms",
     "django_htmx",
-    # Webpack integration
+    # Frontend integration
     "webpack_boilerplate",
+    "turbo_helper",
     # Our apps
     "apps.core",
     "apps.home",
@@ -93,6 +92,7 @@ MIDDLEWARE = [
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "wagtail.contrib.redirects.middleware.RedirectMiddleware",
+    "turbo_helper.middleware.TurboMiddleware",
 ]
 
 # if not DEBUG:

@@ -1,11 +1,11 @@
 // import CSS styles
 import "../css/styles.css";
 
-// Import HTMX
-import "htmx.org";
-
 // Import GSAP
 import { gsap } from "gsap";
+
+// Import Turbo
+import "@hotwired/turbo";
 
 // Import Stimulus
 import { Application } from "@hotwired/stimulus";

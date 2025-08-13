@@ -17,6 +17,8 @@
   "license": "MIT",
   "dependencies": {
     "@hotwired/stimulus": "^3.2.2",
+    "@hotwired/turbo": "^8.0.13",
+    "@rails/actioncable": "^8.0.200",
     "gsap": "^3.13.0",
     "htmx.org": "^2.0.6"
   },

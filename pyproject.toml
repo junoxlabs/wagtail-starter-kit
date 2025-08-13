@@ -20,6 +20,8 @@ dependencies = [
     "django-environ>=0.12.0",
     "dj-database-url>=3.0.1",
     "granian[reload]>=2.5.0",
+    "django-actioncable>=1.0.4",
+    "django-turbo-helper>=2.1.4",
 ]
 
 [tool.uv]
