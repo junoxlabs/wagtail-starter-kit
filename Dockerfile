@@ -72,4 +72,4 @@ RUN mkdir -p /app/.cache && chown wagtail:wagtail /app/.cache && UV_CACHE_DIR=/a
 
 # Runtime command that executes when "docker run" is called.
 # This is the production command.
-CMD ["/bin/bash", "-c", "set -xe; /uv run python manage.py migrate --noinput; /uv run gunicorn config.wsgi:application --bind 0.0.0.0:$PORT"]
+CMD ["/bin/bash", "-c", "set -xe; /uv run python manage.py migrate --noinput; /uv run granian --ws --interface asginl --workers 2 config.asgi:application --host 0.0.0.0 --port $PORT"]

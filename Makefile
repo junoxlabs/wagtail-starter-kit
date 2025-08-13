@@ -2,7 +2,7 @@ MAKEFLAGS += -j4
 
 .PHONY: frontend-install frontend-build frontend-dev django-dev django-install install i dev
 
-# runs django and frontend dev servers parallelly 
+# runs django and frontend dev servers parallelly
 dev: frontend-dev django-dev
 
 i: install
@@ -26,13 +26,13 @@ django-install:
 	uv sync --locked
 
 django-dev:
-	uv run python manage.py runserver
+	uv run granian --reload --interface asginl --workers 1 --runtime-threads 2 config.asgi:application
 
 frontend-install:
 	cd apps/frontend/static_src && bun --bun install
 
 frontend-build: # uses node 22 (bun doesn't work with webpack yet)
-	cd apps/frontend/static_src && rm -rf ../build && bun run build 
+	cd apps/frontend/static_src && rm -rf ../build && bun run build
 
 frontend-dev:
 	cd apps/frontend/static_src && rm -rf ../build && bun --bun run dev
