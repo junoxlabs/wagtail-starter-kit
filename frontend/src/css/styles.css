@@ -2,8 +2,8 @@
   Tell Tailwind where to find your HTML templates and JS files.
   Paths are relative to this CSS file.
 */
-@source "../src/**/*.{js,ts}";
-@source "../../../../../templates/**/*.html";
+@source "../js/**/*.{js,ts}";
+@source "../../../templates/**/*.html";
 
 /* Import the core Tailwind v4 engine */
 @import "tailwindcss";

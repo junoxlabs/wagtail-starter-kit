@@ -22,6 +22,7 @@ dependencies = [
     "granian[reload]>=2.5.0",
     "django-actioncable>=1.0.4",
     "django-turbo-helper>=2.1.4",
+    "django-vite>=3.1.0",
 ]
 
 [tool.uv]

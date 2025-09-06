@@ -1,4 +1,5 @@
 import os
+import re
 from pathlib import Path
 import environ
 import dj_database_url
@@ -9,6 +10,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 env = environ.Env(
     # set casting, default value
     DEBUG=(bool, False),
+    ENVIRONMENT=(str, "development"),
     SECRET_KEY=(str, "django-insecure-dummy-key-for-builds-and-dev-only"),
     DATABASE_URL=(str, "sqlite:///dummy.db"),
     ALLOWED_HOSTS=(str, "*"),
@@ -67,12 +69,11 @@ INSTALLED_APPS = [
     "wagtail_flexible_forms",
     "django_htmx",
     # Frontend integration
-    "webpack_boilerplate",
+    "django_vite",
     "turbo_helper",
     # Our apps
     "apps.core",
     "apps.home",
-    "apps.frontend",
     "apps.blocks",
     "apps.navigation.apps.NavigationConfig",
     "apps.settings",
@@ -168,8 +169,11 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
 STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, "apps/frontend/build"),
+    BASE_DIR / "frontend/dist",  # Vite build output
 ]
+
+STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
+STATIC_URL = "/static/"
 
 STORAGES = {
     "default": {
@@ -181,8 +185,25 @@ STORAGES = {
     },
 }
 
-STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
-STATIC_URL = "/static/"
+
+# http://whitenoise.evans.io/en/stable/django.html#WHITENOISE_IMMUTABLE_FILE_TEST
+def immutable_file_test(path, url):
+    # Match vite (rollup)-generated hashes, à la, `some_file-CSliV9zW.js`
+    return re.match(r"^.+[.-][0-9a-zA-Z_-]{8,12}\..+$", url)
+
+
+WHITENOISE_IMMUTABLE_FILE_TEST = immutable_file_test
+
+# Django-Vite Settings
+# ------------------------------------------------------------------------------
+DJANGO_VITE = {
+    "default": {
+        "dev_mode": True if env("ENVIRONMENT") == "development" else False,
+        "dev_server_host": "localhost",
+        "dev_server_port": 5173,
+    }
+}
+
 
 MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 MEDIA_URL = "/media/"

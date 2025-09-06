@@ -3,7 +3,7 @@ MAKEFLAGS += -j4
 .PHONY: frontend-install frontend-build frontend-dev django-dev django-install install i dev
 
 # runs django and frontend dev servers parallelly
-dev: frontend-dev django-dev
+dev: vite-dev django-dev
 
 i: install
 install: django-install frontend-install
@@ -16,10 +16,10 @@ clean-venv:
 	rm -r .venv
 
 clean-frontend-build:
-	cd apps/frontend && rm -r ./build
+	cd frontend && rm -r ./dist
 
 clean-frontend-node-modules:
-	cd apps/frontend/static_src && rm -r node_modules
+	cd frontend && rm -r node_modules
 
 ### installs the virtual environment and dependencies
 django-install:
@@ -29,10 +29,29 @@ django-dev:
 	uv run granian --reload --interface asginl --workers 1 --runtime-threads 2 config.asgi:application
 
 frontend-install:
-	cd apps/frontend/static_src && bun --bun install
+	cd frontend && bun --bun install
 
-frontend-build: # uses node 22 (bun doesn't work with webpack yet)
-	cd apps/frontend/static_src && rm -rf ../build && bun run build
+vite-build:
+	cd frontend && bun --bun run build
 
-frontend-dev:
-	cd apps/frontend/static_src && rm -rf ../build && bun --bun run dev
+vite-dev:
+	cd frontend && bun --bun run dev
+
+
+makemigrations make migrations:
+	uv run python manage.py makemigrations
+
+migrate:
+	uv run python manage.py migrate
+
+collectstatic:
+	uv run python manage.py collectstatic --no-input --clear
+
+prod-start:
+	env ENVIRONMENT=production uv run granian \
+		--interface asginl \
+ 		--workers 3 \
+ 		--runtime-mode mt \
+ 		--host 0.0.0.0 \
+ 		--port 8000 \
+ 		config.asgi:application

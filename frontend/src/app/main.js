@@ -1,3 +1,6 @@
+// Import Vite modulepreload polyfill [django-vite docs]
+import "vite/modulepreload-polyfill";
+
 // import CSS styles
 import "../css/styles.css";
 
@@ -7,6 +10,9 @@ import { gsap } from "gsap";
 // Import Turbo
 import "@hotwired/turbo";
 
+// Disable Turbo Drive by default globally
+// Turbo.session.drive = false;
+
 // Import Stimulus
 import { Application } from "@hotwired/stimulus";
 
@@ -14,12 +20,14 @@ import { Application } from "@hotwired/stimulus";
 const app = Application.start();
 
 // Auto-register Stimulus controllers
-const context = require.context("./controllers", true, /\.js$/);
-context.keys().forEach((filename) => {
+const modules = import.meta.glob("./controllers/**/*.js", { eager: true });
+
+Object.entries(modules).forEach(([filename, module]) => {
   // Convert the filename to a controller name
   const controllerName = filename
-    // Remove the leading "./"
+    // Remove the leading "./controllers/"
     .replace(/^\.\//, "")
+    .replace(/^controllers\//, "")
     // Remove the ".js" extension
     .replace(/\.js$/, "")
     // Replace underscores with dashes
@@ -27,8 +35,6 @@ context.keys().forEach((filename) => {
     // Replace slashes with double dashes
     .replace(/\//g, "--");
 
-  // Import the controller module
-  const module = context(filename);
   // Register the controller with the Stimulus application
   app.register(controllerName, module.default);
 });
