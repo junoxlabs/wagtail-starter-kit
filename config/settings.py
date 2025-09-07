@@ -175,15 +175,40 @@ STATICFILES_DIRS = [
 STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
 STATIC_URL = "/static/"
 
+# S3 settings for media files (used by default)
 STORAGES = {
     "default": {
-        "BACKEND": "django.core.files.storage.FileSystemStorage",
+        "BACKEND": "config.storage.CustomS3Boto3Storage",
+        "OPTIONS": {
+            "public_endpoint_url": env(
+                "AWS_S3_PUBLIC_ENDPOINT_URL", default="http://localhost:9000"
+            ),
+        },
     },
     "staticfiles": {
         # "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
         "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
     },
 }
+
+# AWS settings for S3
+AWS_ACCESS_KEY_ID = env("AWS_ACCESS_KEY_ID")
+AWS_SECRET_ACCESS_KEY = env("AWS_SECRET_ACCESS_KEY")
+AWS_STORAGE_BUCKET_NAME = env("AWS_STORAGE_BUCKET_NAME")
+AWS_S3_REGION_NAME = env("AWS_S3_REGION_NAME", default="us-east-1")
+AWS_S3_ENDPOINT_URL = env("AWS_S3_ENDPOINT_URL", default=None)
+AWS_S3_FILE_OVERWRITE = False
+AWS_DEFAULT_ACL = None
+AWS_S3_VERIFY = True
+AWS_QUERYSTRING_AUTH = True
+
+# When using MinIO, we need to set this to False to avoid SSL issues
+AWS_S3_SECURE_URLS = env("AWS_S3_SECURE_URLS", default=True)
+
+# Ensure query string authentication is enabled and set expiration
+AWS_QUERYSTRING_EXPIRE = env(
+    "AWS_QUERYSTRING_EXPIRE", default=1800
+)  # 1/2 hour expiration
 
 
 # http://whitenoise.evans.io/en/stable/django.html#WHITENOISE_IMMUTABLE_FILE_TEST
