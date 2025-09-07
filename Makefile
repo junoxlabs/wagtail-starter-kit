@@ -1,9 +1,5 @@
 MAKEFLAGS += -j4
 
-.PHONY: frontend-install frontend-build frontend-dev django-dev django-install install i dev
-
-# runs django and frontend dev servers parallelly
-dev: vite-dev django-dev
 
 i: install
 install: django-install frontend-install
@@ -26,17 +22,24 @@ django-install:
 	uv sync --locked
 
 django-dev:
-	uv run granian --reload --interface asginl --workers 1 --runtime-threads 2 config.asgi:application
+	uv run granian --reload \
+		--interface asginl \
+		--workers 2 \
+		--runtime-mode mt \
+		--log-level debug \
+		--host 0.0.0.0 \
+		--port 8000 \
+		config.asgi:application
+
+.PHONY: vite-dev
+vite-dev:
+	cd frontend && bun --bun run dev
 
 frontend-install:
 	cd frontend && bun --bun install
 
 vite-build:
 	cd frontend && bun --bun run build
-
-vite-dev:
-	cd frontend && bun --bun run dev
-
 
 makemigrations make migrations:
 	uv run python manage.py makemigrations
@@ -47,6 +50,10 @@ migrate:
 collectstatic:
 	uv run python manage.py collectstatic --no-input --clear
 
+#! dev super user
+dev-createsuperuser:
+	docker compose -f dev/docker-compose.dev.yml exec app env DJANGO_SUPERUSER_PASSWORD=admin uv run python manage.py createsuperuser --noinput --username admin --email admin@example.com
+
 prod-start:
 	env ENVIRONMENT=production uv run granian \
 		--interface asginl \
@@ -55,3 +62,39 @@ prod-start:
  		--host 0.0.0.0 \
  		--port 8000 \
  		config.asgi:application
+
+#### DOCKER DEV #### -----------------------------------------------------------------------------
+.PHONY: dev-up dev
+dev-up dev:
+	docker compose -f dev/docker-compose.dev.yml up --build -d
+
+.PHONY: dev-down dev-stop
+dev-down dev-stop stop:
+	docker compose -f dev/docker-compose.dev.yml down
+
+.PHONY: dev-clean
+dev-clean:
+	docker compose -f dev/docker-compose.dev.yml down -v
+
+.PHONY: dev-restart restart
+dev-restart restart:
+	make dev-down
+	make dev-up
+
+.PHONY: dev-logs
+dev-logs logs:
+	docker compose -f dev/docker-compose.dev.yml logs -f
+
+.PHONY: dev-ps
+dev-ps ps:
+	docker compose -f dev/docker-compose.dev.yml ps
+
+.PHONY: dev-bash bash
+dev-bash bash:
+	docker compose -f dev/docker-compose.dev.yml exec app bash
+
+.PHONY: dev-shell shell
+dev-shell shell:
+	docker compose -f dev/docker-compose.dev.yml exec app uv run python manage.py shell -v 2
+
+## - END DOCKER DEV - ## -------------------------------------------------------------------------
