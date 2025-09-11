@@ -6,22 +6,22 @@ A modern, flexible foundation for building high-performance marketing websites w
 
 - **Django 5.2 LTS** and **Wagtail 7.0 LTS** - Latest stable versions
 - **Tailwind CSS v4** with **DaisyUI v5** - Modern utility-first CSS framework
-- **HTMX 2.0.6** + **Stimulus 3** - Enhanced interactivity without complex JavaScript
+- **Turbo 8** + **Stimulus 3** - Enhanced interactivity without complex JavaScript
 - **StreamField Blocks** - Flexible content composition system
 - **Navigation Snippets** - Reusable menu system
 - **SEO Ready** - Built-in SEO functionality with wagtail-seo
-- **Caching** - Performance optimization with wagtail-cache and Redis
+- **Caching** - Performance optimization with wagtail-cache
 - **Forms** - Flexible form handling with wagtail-flexible-forms
-- **Webpack Integration** - Modern asset pipeline
+- **Django-Vite Integration** - Modern asset pipeline
 
 ## Project Structure
 
 ```
 ├── apps/
-│   ├── blocks/           # Custom StreamField blocks
+│   ├── blocks/          # Custom StreamField blocks
 │   ├── core/            # Base models and utilities
 │   ├── frontend/        # Frontend assets and Tailwind integration
-│   ├── home/            # Homepage model and templates
+│   ├── pages/           # Page models and templates
 │   ├── navigation/      # Navigation menu snippets
 │   ├── seo/             # SEO settings and functionality
 │   ├── search/          # Site search functionality
@@ -30,8 +30,8 @@ A modern, flexible foundation for building high-performance marketing websites w
 ├── templates/           # Django templates
 │   ├── pages/           # Page-specific templates
 │   ├── blocks/          # StreamField block templates
-│   ├── includes/       # Reusable template components
-│   └── snippets/       # Snippet templates
+│   ├── includes/        # Reusable template components
+│   └── snippets/        # Snippet templates
 └── static/              # Static files
 ```
 
@@ -89,11 +89,40 @@ A modern, flexible foundation for building high-performance marketing websites w
 
 ### BasePage Model
 
-All page types inherit from `BasePage` which includes:
+Abstract base page model that defines common fields and functionality that should be shared across all page types.
+Inherits from `SeoMixin` and `Page` to provide SEO functionality via wagtail-seo.
 
 - SEO Title and Description
 - Open Graph Image
 - Structured data support
+- UUID field for stable identifiers
+
+### FlexPage Model
+
+A flexible page model that can be used for the homepage or other standard pages.
+It uses a StreamField for maximum content flexibility.
+Inherits from `BasePage`.
+
+### BaseEntityPage Model
+
+Abstract base page for all showcase entities with common fields.
+Inherits from `FlexPage` (and thus `BasePage`).
+- Category (ForeignKey to Category snippet)
+- URL type preference (SEO-friendly or UUID-based)
+
+### ShowcasePage Model
+
+A page that showcases different types of entities (projects, services, portfolio items, resources).
+Can display entities by category and supports filtering by entity type.
+Inherits from `BasePage`.
+
+### ProjectPage, ServicePage, PortfolioItemPage, ResourcePage Models
+
+Specific page types for different entity categories:
+- ProjectPage: Inherits from `BaseEntityPage`
+- ServicePage: Inherits from `BaseEntityPage`
+- PortfolioItemPage: Inherits from `BaseEntityPage`
+- ResourcePage: Inherits from `BaseEntityPage`
 
 ### StreamField Blocks
 
@@ -134,18 +163,17 @@ The starter kit includes a comprehensive set of reusable blocks:
 
 ### JavaScript
 
-- HTMX for dynamic interactions without writing JavaScript
-- Stimulus for more complex behaviors when needed
+- Turbo 8 & Stimulus 3 for for dynamic interactions and complex behaviors when needed
 
 ### Asset Pipeline
 
-- Webpack for bundling and optimization
+- Vite for bundling and optimization
 - Bun for fast JavaScript package management
 - Development and production build configurations
 
 ## Performance Features
 
-- Redis caching with wagtail-cache
+- Sqlite caching with wagtail-cache
 - Frontend cache invalidation
 - Template fragment caching
 - Image optimization with Wagtail's image tag
