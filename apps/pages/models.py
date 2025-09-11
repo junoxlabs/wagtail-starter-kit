@@ -7,7 +7,6 @@ from wagtail.snippets.models import register_snippet
 from modelcluster.fields import ParentalKey
 from apps.core.models import BasePage
 from apps.blocks.models import ContentStreamBlock
-import uuid
 
 
 class FlexPage(BasePage):
@@ -103,7 +102,6 @@ class BaseEntityPage(FlexPage):
     Abstract base page for all showcase entities with common fields.
     """
 
-    uuid = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
     category = models.ForeignKey(
         "pages.Category",
         on_delete=models.SET_NULL,
