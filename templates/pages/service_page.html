@@ -1,0 +1,11 @@
+{% extends "pages/entity_base.html" %}
+{% load wagtailcore_tags wagtailimages_tags %}
+
+{% block content %}
+    {{ block.super }}
+
+    <div class="mt-8">
+        <h2 class="text-2xl font-semibold mb-4">Service Details</h2>
+        <p class="text-gray-600">This service has a dedicated page with detailed information.</p>
+    </div>
+{% endblock %}

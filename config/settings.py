@@ -73,7 +73,7 @@ INSTALLED_APPS = [
     "turbo_helper",
     # Our apps
     "apps.core",
-    "apps.home",
+    "apps.pages",
     "apps.blocks",
     "apps.navigation.apps.NavigationConfig",
     "apps.settings",

@@ -1,0 +1,18 @@
+{% extends "pages/entity_base.html" %}
+{% load wagtailcore_tags wagtailimages_tags %}
+
+{% block content %}
+    {{ block.super }}
+
+    {% if page.has_page %}
+        <div class="mt-8">
+            <h2 class="text-2xl font-semibold mb-4">Project Details</h2>
+            <p class="text-gray-600">This project has its own dedicated page.</p>
+        </div>
+    {% else %}
+        <div class="mt-8">
+            <h2 class="text-2xl font-semibold mb-4">Project Overview</h2>
+            <p class="text-gray-600">This project is listed without a dedicated page.</p>
+        </div>
+    {% endif %}
+{% endblock %}

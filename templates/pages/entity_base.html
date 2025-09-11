@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+{% load wagtailcore_tags wagtailimages_tags %}
+
+{% block content %}
+    <div class="entity-page">
+        <h1 class="text-3xl font-bold mb-4">{{ page.title }}</h1>
+
+        {% if page.category %}
+            <p class="text-lg mb-4">Category: {{ page.category.name }}</p>
+        {% endif %}
+
+        {% if page.specific.image %}
+            <div class="mb-6">
+                {% image page.specific.image width-800 class="w-full rounded-lg" %}
+            </div>
+        {% endif %}
+
+        <div class="content mb-8">
+            {% if page.description %}
+                <p class="text-gray-700 text-lg">{{ page.description }}</p>
+            {% endif %}
+
+            {% if page.body %}
+                <div class="mt-6">
+                    {% for block in page.body %}
+                        {% include_block block %}
+                    {% endfor %}
+                </div>
+            {% endif %}
+        </div>
+
+        {% if page.specific.links.all %}
+            <div class="links-section mb-8">
+                <h2 class="text-2xl font-semibold mb-4">Links</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {% for link_item in page.specific.links.all %}
+                        <div class="link-card bg-gray-100 rounded-lg p-4">
+                            <h3 class="font-bold text-lg mb-2">
+                                <a href="{{ link_item.link.url }}" target="_blank" class="text-blue-600 hover:underline">
+                                    {{ link_item.link.title }}
+                                </a>
+                            </h3>
+                            <p class="text-gray-600">{{ link_item.link.get_link_type_display }}</p>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        {% endif %}
+
+        <div class="url-info text-sm text-gray-500">
+            <p>URL Type: {{ page.get_url_type_preference_display }}</p>
+            {% if page.url_type_preference == 'uuid' %}
+                <p>UUID URL: <a href="{{ page.get_uuid_url }}" class="text-blue-500 hover:underline">{{ page.get_uuid_url }}</a></p>
+            {% endif %}
+        </div>
+    </div>
+{% endblock %}
