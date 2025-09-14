@@ -63,6 +63,7 @@ services:
       - ../.env
     environment:
       - ENVIRONMENT=development
+      - DEBUG=true
       - DATABASE_URL=postgresql://postgres:postgres@db:5432/db
       - REDIS_URL=redis://redis:6379
       - AWS_ACCESS_KEY_ID=minioadmin
