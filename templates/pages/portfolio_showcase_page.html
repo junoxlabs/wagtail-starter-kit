@@ -11,7 +11,7 @@
             </div>
         {% endif %}
 
-        {% for section in page.sections.all %}
+        {% for section in page.portfolio_sections.all %}
             <div class="section mb-12">
                 <h2 class="text-2xl font-semibold mb-4 border-b pb-2">{{ section.heading }}</h2>
 
@@ -36,6 +36,15 @@
 
                             {% if item.description %}
                                 <p class="text-gray-700 mb-4">{{ item.description }}</p>
+                            {% endif %}
+
+                            {% comment %}
+                            Display image for portfolio items
+                            {% endcomment %}
+                            {% if item.page and item.page.specific.image %}
+                                <div class="mb-4">
+                                    {% image item.page.specific.image fill-300x200 class="w-full h-48 object-cover rounded" %}
+                                </div>
                             {% endif %}
 
                             {% if item.get_links %}

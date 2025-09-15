@@ -5,6 +5,7 @@ from wagtail.admin.panels import FieldPanel, InlinePanel
 from wagtail.models import Orderable
 from wagtail.snippets.models import register_snippet
 from modelcluster.fields import ParentalKey
+from modelcluster.models import ClusterableModel
 from apps.core.models import BasePage
 from apps.blocks.models import ContentStreamBlock
 
@@ -30,7 +31,7 @@ class FlexPage(BasePage):
     settings_panels = BasePage.settings_panels
 
     # Allow only one instance at the root level
-    parent_page_types = ["wagtailcore.Page", "home.FlexPage"]
+    parent_page_types = ["wagtailcore.Page", "pages.FlexPage"]
 
     # Specify the template for this page
     template = "pages/flex_page.html"
@@ -41,9 +42,10 @@ class FlexPage(BasePage):
 
 
 @register_snippet
-class Category(models.Model):
+class Tag(models.Model):
     """
-    A category for organizing showcase entities.
+    A tag for organizing and filtering showcase entities.
+    Tags can be assigned to any BaseEntityPage to categorize content.
     """
 
     name = models.CharField(max_length=100, unique=True)
@@ -58,52 +60,20 @@ class Category(models.Model):
         return self.name
 
     class Meta:
-        verbose_name = "Category"
-        verbose_name_plural = "Categories"
+        verbose_name = "Tag"
+        verbose_name_plural = "Tags"
         ordering = ["name"]
-
-
-@register_snippet
-class Link(models.Model):
-    """
-    A link with title, URL, and type.
-    """
-
-    LINK_TYPE_CHOICES = [
-        ("website", "Website"),
-        ("github", "GitHub"),
-        ("demo", "Demo"),
-        ("documentation", "Documentation"),
-        ("other", "Other"),
-    ]
-
-    title = models.CharField(max_length=200)
-    url = models.URLField()
-    link_type = models.CharField(
-        max_length=20, choices=LINK_TYPE_CHOICES, default="website"
-    )
-
-    panels = [
-        FieldPanel("title"),
-        FieldPanel("url"),
-        FieldPanel("link_type"),
-    ]
-
-    def __str__(self):
-        return self.title
-
-    class Meta:
-        verbose_name = "Link"
-        verbose_name_plural = "Links"
 
 
 class BaseEntityPage(FlexPage):
     """
     Abstract base page for all showcase entities with common fields.
+    Entities can be tagged with a Tag for organization and filtering.
+    This model provides common functionality for all showcase entity types.
     """
 
-    category = models.ForeignKey(
-        "pages.Category",
+    tag = models.ForeignKey(
+        "pages.Tag",
         on_delete=models.SET_NULL,
         null=True,
         blank=True,
@@ -121,9 +91,9 @@ class BaseEntityPage(FlexPage):
         help_text="Choose whether to display SEO-friendly URLs or UUID-based URLs",
     )
 
-    # Add category to content panels
+    # Add tag to content panels
     content_panels = FlexPage.content_panels + [
-        FieldPanel("category"),
+        FieldPanel("tag"),
         FieldPanel("url_type_preference"),
     ]
 
@@ -165,24 +135,6 @@ class BaseEntityPage(FlexPage):
         return "#"
 
 
-class ProjectLink(Orderable):
-    """
-    Links for a project.
-    """
-
-    project = ParentalKey(
-        "pages.ProjectPage", on_delete=models.CASCADE, related_name="links"
-    )
-    link = models.ForeignKey("pages.Link", on_delete=models.CASCADE, related_name="+")
-
-    panels = [
-        FieldPanel("link"),
-    ]
-
-    def __str__(self):
-        return f"{self.project.title} -> {self.link.title}"
-
-
 class ProjectPage(BaseEntityPage):
     """
     A project page that may or may not have child pages.
@@ -194,10 +146,9 @@ class ProjectPage(BaseEntityPage):
 
     content_panels = BaseEntityPage.content_panels + [
         FieldPanel("has_page"),
-        InlinePanel("links", label="Links"),
     ]
 
-    parent_page_types = ["pages.ShowcasePage"]
+    parent_page_types = ["pages.ProjectShowcasePage"]
     subpage_types = ["pages.FlexPage"]  # Only if has_page is True
     template = "pages/project_page.html"
 
@@ -224,15 +175,14 @@ class ServicePage(BaseEntityPage):
     A service page that always has child pages.
     """
 
-    content_panels = BaseEntityPage.content_panels + [
-        InlinePanel(
-            "links",
-            label="Links",
-            help_text="Services typically don't have links in list view, but you can add them here if needed",
-        ),
-    ]
+    content_panels = (
+        BaseEntityPage.content_panels
+        + [
+            # Services typically don't have links in list view, but you can add them here if needed
+        ]
+    )
 
-    parent_page_types = ["pages.ShowcasePage"]
+    parent_page_types = ["pages.ServiceShowcasePage"]
     subpage_types = ["pages.FlexPage"]
     template = "pages/service_page.html"
 
@@ -243,24 +193,6 @@ class ServicePage(BaseEntityPage):
     class Meta:
         verbose_name = "Service Page"
         verbose_name_plural = "Service Pages"
-
-
-class PortfolioItemLink(Orderable):
-    """
-    Links for a portfolio item.
-    """
-
-    portfolio_item = ParentalKey(
-        "pages.PortfolioItemPage", on_delete=models.CASCADE, related_name="links"
-    )
-    link = models.ForeignKey("pages.Link", on_delete=models.CASCADE, related_name="+")
-
-    panels = [
-        FieldPanel("link"),
-    ]
-
-    def __str__(self):
-        return f"{self.portfolio_item.title} -> {self.link.title}"
 
 
 class PortfolioItemPage(BaseEntityPage):
@@ -278,10 +210,9 @@ class PortfolioItemPage(BaseEntityPage):
 
     content_panels = BaseEntityPage.content_panels + [
         FieldPanel("image"),
-        InlinePanel("links", label="Links"),
     ]
 
-    parent_page_types = ["pages.ShowcasePage"]
+    parent_page_types = ["pages.PortfolioShowcasePage"]
     subpage_types = ["pages.FlexPage"]
     template = "pages/portfolio_item_page.html"
 
@@ -290,129 +221,362 @@ class PortfolioItemPage(BaseEntityPage):
         verbose_name_plural = "Portfolio Item Pages"
 
 
-class ResourceLink(Orderable):
+class AbstractShowcasePage(BasePage):
     """
-    Links for a resource.
+    Abstract base page for showcasing different types of entities.
+    Editors can create sections and explicitly assign items to each section.
     """
 
-    resource = ParentalKey(
-        "pages.ResourcePage", on_delete=models.CASCADE, related_name="links"
+    # Introduction text for the page
+    introduction = models.TextField(
+        blank=True, help_text="Optional introduction text for the showcase page"
     )
-    link = models.ForeignKey("pages.Link", on_delete=models.CASCADE, related_name="+")
-
-    panels = [
-        FieldPanel("link"),
-    ]
-
-    def __str__(self):
-        return f"{self.resource.title} -> {self.link.title}"
-
-
-class ResourcePage(BaseEntityPage):
-    """
-    A resource page that doesn't have its own page (no child pages).
-    """
-
-    content_panels = BaseEntityPage.content_panels + [
-        InlinePanel("links", label="Links"),
-    ]
-
-    parent_page_types = ["pages.ShowcasePage"]
-    subpage_types = []  # Resources don't have child pages
-    template = "pages/resource_page.html"
-
-    def save(self, *args, **kwargs):
-        # Resources never have pages, so ensure subpage_types is empty
-        self.subpage_types = []
-        super().save(*args, **kwargs)
 
     class Meta:
-        verbose_name = "Resource Page"
-        verbose_name_plural = "Resource Pages"
+        abstract = True
+        verbose_name = "Abstract Showcase Page"
+        verbose_name_plural = "Abstract Showcase Pages"
 
 
-class ShowcasePage(BasePage):
+class ProjectShowcasePage(AbstractShowcasePage):
     """
-    A page that showcases different types of entities (projects, services, portfolio items, resources).
-    Can display entities by category.
+    A page that showcases projects.
     """
 
-    ENTITY_TYPE_CHOICES = [
-        ("projects", "Projects"),
-        ("services", "Services"),
-        ("portfolio", "Portfolio Items"),
-        ("resources", "Resources"),
+    content_panels = AbstractShowcasePage.content_panels + [
+        FieldPanel("introduction"),
+        InlinePanel(
+            "project_sections",
+            label="Sections",
+            help_text="Add and order sections to display on this page",
+        ),
     ]
 
-    entity_types_to_display = models.CharField(
-        max_length=100,
-        choices=ENTITY_TYPE_CHOICES,
-        default="projects",
-        help_text="Select which entity type to display",
+    template = "pages/project_showcase_page.html"
+    parent_page_types = ["wagtailcore.Page", "pages.FlexPage"]
+    subpage_types = ["pages.ProjectPage"]
+
+    class Meta:
+        verbose_name = "Project Showcase Page"
+        verbose_name_plural = "Project Showcase Pages"
+
+
+class ServiceShowcasePage(AbstractShowcasePage):
+    """
+    A page that showcases services.
+    """
+
+    content_panels = AbstractShowcasePage.content_panels + [
+        FieldPanel("introduction"),
+        InlinePanel(
+            "service_sections",
+            label="Sections",
+            help_text="Add and order sections to display on this page",
+        ),
+    ]
+
+    template = "pages/service_showcase_page.html"
+    parent_page_types = ["wagtailcore.Page", "pages.FlexPage"]
+    subpage_types = ["pages.ServicePage"]
+
+    class Meta:
+        verbose_name = "Service Showcase Page"
+        verbose_name_plural = "Service Showcase Pages"
+
+
+class PortfolioShowcasePage(AbstractShowcasePage):
+    """
+    A page that showcases portfolio items.
+    """
+
+    content_panels = AbstractShowcasePage.content_panels + [
+        FieldPanel("introduction"),
+        InlinePanel(
+            "portfolio_sections",
+            label="Sections",
+            help_text="Add and order sections to display on this page",
+        ),
+    ]
+
+    template = "pages/portfolio_showcase_page.html"
+    parent_page_types = ["wagtailcore.Page", "pages.FlexPage"]
+    subpage_types = ["pages.PortfolioItemPage"]
+
+    class Meta:
+        verbose_name = "Portfolio Showcase Page"
+        verbose_name_plural = "Portfolio Showcase Pages"
+
+
+class ResourceShowcasePage(AbstractShowcasePage):
+    """
+    A page that showcases resources.
+    """
+
+    content_panels = AbstractShowcasePage.content_panels + [
+        FieldPanel("introduction"),
+        InlinePanel(
+            "resource_sections",
+            label="Sections",
+            help_text="Add and order sections to display on this page",
+        ),
+    ]
+
+    template = "pages/resource_showcase_page.html"
+    parent_page_types = ["wagtailcore.Page", "pages.FlexPage"]
+    subpage_types = []
+
+    class Meta:
+        verbose_name = "Resource Showcase Page"
+        verbose_name_plural = "Resource Showcase Pages"
+
+
+class AbstractShowcaseSection(ClusterableModel, Orderable):
+    """
+    Abstract base model for showcase sections. Editors explicitly assign items to each section.
+    """
+
+    # Section heading
+    heading = models.CharField(max_length=200, help_text="Heading for this section")
+
+    # Custom description for the section
+    description = models.TextField(
+        blank=True, help_text="Optional description for this section"
     )
 
-    category_filter = models.ForeignKey(
-        "pages.Category",
+    panels = [
+        FieldPanel("heading"),
+        FieldPanel("description"),
+        InlinePanel("items", label="Items", help_text="Add items to this section"),
+    ]
+
+    class Meta:
+        abstract = True
+
+    def __str__(self):
+        return f"{self.showcase_page.title} -> {self.heading}"
+
+    def get_items(self):
+        """
+        Get items explicitly assigned to this section.
+        """
+        return self.items.all()
+
+
+class ProjectShowcaseSection(AbstractShowcaseSection):
+    """
+    A section on the project showcase page.
+    """
+
+    showcase_page = ParentalKey(
+        "pages.ProjectShowcasePage",
+        on_delete=models.CASCADE,
+        related_name="project_sections",
+    )
+
+
+class ServiceShowcaseSection(AbstractShowcaseSection):
+    """
+    A section on the service showcase page.
+    """
+
+    showcase_page = ParentalKey(
+        "pages.ServiceShowcasePage",
+        on_delete=models.CASCADE,
+        related_name="service_sections",
+    )
+
+
+class PortfolioShowcaseSection(AbstractShowcaseSection):
+    """
+    A section on the portfolio showcase page.
+    """
+
+    showcase_page = ParentalKey(
+        "pages.PortfolioShowcasePage",
+        on_delete=models.CASCADE,
+        related_name="portfolio_sections",
+    )
+
+
+class ResourceShowcaseSection(AbstractShowcaseSection):
+    """
+    A section on the resource showcase page.
+    """
+
+    showcase_page = ParentalKey(
+        "pages.ResourceShowcasePage",
+        on_delete=models.CASCADE,
+        related_name="resource_sections",
+    )
+
+
+class AbstractShowcaseItem(ClusterableModel, Orderable):
+    """
+    Abstract base model for showcase items. Each item has its own title, description, and links,
+    and can optionally be attached to a page.
+    """
+
+    # Item fields
+    title = models.CharField(
+        max_length=200, help_text="Title for this item", default="Untitled"
+    )
+    description = models.TextField(blank=True, help_text="Description for this item")
+
+    # Optional page reference
+    page = models.ForeignKey(
+        "wagtailcore.Page",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        help_text="Optional page to link to",
+    )
+
+    panels = [
+        FieldPanel("title"),
+        FieldPanel("description"),
+        FieldPanel("page"),
+        InlinePanel("links", label="Links", help_text="Links for this item"),
+    ]
+
+    class Meta:
+        abstract = True
+
+    def __str__(self):
+        return f"{self.section.heading} -> {self.title}"
+
+    def get_links(self):
+        """
+        Get links for this item.
+        """
+        return self.links.all()
+
+
+class ProjectShowcaseItem(AbstractShowcaseItem):
+    """
+    An item in a project showcase section.
+    """
+
+    section = ParentalKey(
+        "pages.ProjectShowcaseSection", on_delete=models.CASCADE, related_name="items"
+    )
+
+
+class ServiceShowcaseItem(AbstractShowcaseItem):
+    """
+    An item in a service showcase section.
+    """
+
+    section = ParentalKey(
+        "pages.ServiceShowcaseSection", on_delete=models.CASCADE, related_name="items"
+    )
+
+
+class PortfolioShowcaseItem(AbstractShowcaseItem):
+    """
+    An item in a portfolio showcase section. Includes an image field.
+    """
+
+    # Image field specific to portfolio items
+    image = models.ForeignKey(
+        "wagtailimages.Image",
         on_delete=models.SET_NULL,
         null=True,
         blank=True,
         related_name="+",
-        help_text="Filter entities by category (leave blank to show all)",
     )
 
-    content_panels = BasePage.content_panels + [
-        FieldPanel("entity_types_to_display"),
-        FieldPanel("category_filter"),
+    section = ParentalKey(
+        "pages.PortfolioShowcaseSection", on_delete=models.CASCADE, related_name="items"
+    )
+
+    panels = AbstractShowcaseItem.panels + [
+        FieldPanel("image"),
     ]
 
-    parent_page_types = ["wagtailcore.Page"]
-    subpage_types = [
-        "pages.ProjectPage",
-        "pages.ServicePage",
-        "pages.PortfolioItemPage",
-        "pages.ResourcePage",
+
+class ResourceShowcaseItem(AbstractShowcaseItem):
+    """
+    An item in a resource showcase section. Resources don't have pages to link to.
+    """
+
+    section = ParentalKey(
+        "pages.ResourceShowcaseSection", on_delete=models.CASCADE, related_name="items"
+    )
+
+    # Override the page field to make it non-editable for resources
+    page = None
+
+    panels = [
+        FieldPanel("title"),
+        FieldPanel("description"),
+        InlinePanel("links", label="Links", help_text="Links for this item"),
     ]
 
-    template = "pages/showcase_page.html"
+
+class AbstractShowcaseItemLink(Orderable):
+    """
+    Abstract base model for showcase item links.
+    """
+
+    LINK_TARGET_CHOICES = [
+        ("_self", "Same Window"),
+        ("_blank", "New Window"),
+    ]
+
+    title = models.CharField(max_length=200)
+    url = models.URLField()
+    target = models.CharField(
+        max_length=10, choices=LINK_TARGET_CHOICES, default="_self"
+    )
+
+    panels = [
+        FieldPanel("title"),
+        FieldPanel("url"),
+        FieldPanel("target"),
+    ]
 
     class Meta:
-        verbose_name = "Showcase Page"
-        verbose_name_plural = "Showcase Pages"
+        abstract = True
 
-    def get_entities(self):
-        """
-        Get entities based on the selected entity type and category filter.
-        """
-        # Get the appropriate page model based on entity type
-        if self.entity_types_to_display == "projects":
-            entities = ProjectPage.objects.live().descendant_of(self)
-        elif self.entity_types_to_display == "services":
-            entities = ServicePage.objects.live().descendant_of(self)
-        elif self.entity_types_to_display == "portfolio":
-            entities = PortfolioItemPage.objects.live().descendant_of(self)
-        elif self.entity_types_to_display == "resources":
-            entities = ResourcePage.objects.live().descendant_of(self)
-        else:
-            entities = ProjectPage.objects.none()
+    def __str__(self):
+        return f"{self.item.title} -> {self.title}"
 
-        # Apply category filter if specified
-        if self.category_filter:
-            entities = entities.filter(category=self.category_filter)
 
-        return entities
+class ProjectShowcaseItemLink(AbstractShowcaseItemLink):
+    """
+    Links for a project showcase item.
+    """
 
-    def get_entities_by_category(self):
-        """
-        Get entities organized by category.
-        """
-        entities = self.get_entities()
+    item = ParentalKey(
+        "pages.ProjectShowcaseItem", on_delete=models.CASCADE, related_name="links"
+    )
 
-        # Group entities by category
-        categories = {}
-        for entity in entities:
-            category_name = entity.category.name if entity.category else "Uncategorized"
-            if category_name not in categories:
-                categories[category_name] = []
-            categories[category_name].append(entity)
 
-        return categories
+class ServiceShowcaseItemLink(AbstractShowcaseItemLink):
+    """
+    Links for a service showcase item.
+    """
+
+    item = ParentalKey(
+        "pages.ServiceShowcaseItem", on_delete=models.CASCADE, related_name="links"
+    )
+
+
+class PortfolioShowcaseItemLink(AbstractShowcaseItemLink):
+    """
+    Links for a portfolio showcase item.
+    """
+
+    item = ParentalKey(
+        "pages.PortfolioShowcaseItem", on_delete=models.CASCADE, related_name="links"
+    )
+
+
+class ResourceShowcaseItemLink(AbstractShowcaseItemLink):
+    """
+    Links for a resource showcase item.
+    """
+
+    item = ParentalKey(
+        "pages.ResourceShowcaseItem", on_delete=models.CASCADE, related_name="links"
+    )

@@ -11,7 +11,7 @@
             </div>
         {% endif %}
 
-        {% for section in page.sections.all %}
+        {% for section in page.service_sections.all %}
             <div class="section mb-12">
                 <h2 class="text-2xl font-semibold mb-4 border-b pb-2">{{ section.heading }}</h2>
 
@@ -36,21 +36,6 @@
 
                             {% if item.description %}
                                 <p class="text-gray-700 mb-4">{{ item.description }}</p>
-                            {% endif %}
-
-                            {% if item.get_links %}
-                                <div class="links-section">
-                                    <h4 class="font-semibold mb-2">Links:</h4>
-                                    <ul class="list-disc pl-5">
-                                        {% for link_item in item.get_links %}
-                                            <li>
-                                                <a href="{{ link_item.url }}" target="{{ link_item.target }}" class="text-blue-500 hover:underline">
-                                                    {{ link_item.title }}
-                                                </a>
-                                            </li>
-                                        {% endfor %}
-                                    </ul>
-                                </div>
                             {% endif %}
 
                             {% if item.page %}
