@@ -2,7 +2,7 @@ import os
 import re
 from pathlib import Path
 import environ
-import dj_database_url
+# import dj_database_url
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -12,7 +12,7 @@ env = environ.Env(
     DEBUG=(bool, False),
     ENVIRONMENT=(str, "development"),
     SECRET_KEY=(str, "django-insecure-dummy-key-for-builds-and-dev-only"),
-    DATABASE_URL=(str, "sqlite:///dummy.db"),
+    # DATABASE_URL=(str, "sqlite:///dummy.db"),
     ALLOWED_HOSTS=(str, "*"),
     CSRF_TRUSTED_ORIGINS=(str, "https://*, http://*"),
     USE_X_FORWARDED_HOST=(bool, False),
@@ -125,13 +125,48 @@ WSGI_APPLICATION = "config.wsgi.application"
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
+# DATABASES = {
+#     "default": dj_database_url.config(
+#         default=env("DATABASE_URL"),
+#         conn_max_age=600,
+#         conn_health_checks=True,
+#     )
+# }
+
 DATABASES = {
-    "default": dj_database_url.config(
-        default=env("DATABASE_URL"),
-        conn_max_age=600,
-        conn_health_checks=True,
-    )
+    "default": {
+        "ENGINE": "django.db.backends.sqlite3",
+        "NAME": BASE_DIR / "db/database.db",
+        "OPTIONS": {
+            "transaction_mode": "IMMEDIATE",
+            "timeout": 5,  # seconds
+            "init_command": """
+                PRAGMA journal_mode=WAL;
+                PRAGMA synchronous=NORMAL;
+                PRAGMA mmap_size=134217728;
+                PRAGMA journal_size_limit=27103364;
+                PRAGMA cache_size=2000;
+            """,
+        },
+    },
+    "cache": {
+        "ENGINE": "django.db.backends.sqlite3",
+        "NAME": BASE_DIR / "db/cache.db",
+        "OPTIONS": {
+            "transaction_mode": "IMMEDIATE",
+            "timeout": 5,  # seconds
+            "init_command": """
+                PRAGMA journal_mode=WAL;
+                PRAGMA synchronous=NORMAL;
+                PRAGMA mmap_size=134217728;
+                PRAGMA journal_size_limit=27103364;
+                PRAGMA cache_size=2000;
+            """,
+        },
+    },
 }
+
+DATABASE_ROUTERS = ["config.routers.CacheRouter"]
 
 
 # Password validation
@@ -259,22 +294,12 @@ WAGTAIL_CACHE = True
 WAGTAIL_CACHE_BACKEND = "default"
 
 # Cache settings
-# if DEBUG:
 CACHES = {
     "default": {
-        "BACKEND": "django.core.cache.backends.dummy.DummyCache",
+        "BACKEND": "django.core.cache.backends.db.DatabaseCache",
+        "LOCATION": "cache",
     }
 }
-# else:
-#     CACHES = {
-#         "default": {
-#             "BACKEND": "django_redis.cache.RedisCache",
-#             "LOCATION": "redis://127.0.0.1:6379/1",
-#             "OPTIONS": {
-#                 "CLIENT_CLASS": "django_redis.client.DefaultClient",
-#             },
-#         }
-#     }
 
 # Webpack loader settings
 WEBPACK_LOADER = {

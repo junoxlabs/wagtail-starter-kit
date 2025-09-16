@@ -1,0 +1,10 @@
+access-key-id: minioadmin
+secret-access-key: minioadminpassword
+
+dbs:
+  - path: /data/database.db
+    replicas:
+      - type: s3
+        bucket: db-backups
+        path: database.db
+        endpoint: http://s3:9000

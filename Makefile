@@ -23,6 +23,7 @@ django-install:
 
 django-dev:
 	uv run granian --reload \
+		--reload-ignore-paths /app/db/ \
 		--interface asginl \
 		--workers 2 \
 		--runtime-mode mt \
@@ -49,6 +50,9 @@ migrate:
 
 collectstatic:
 	uv run python manage.py collectstatic --no-input --clear
+
+createcachetable cache:
+	uv run python manage.py createcachetable --database cache
 
 #! dev super user
 dev-createsuperuser:
