@@ -91,10 +91,7 @@ class FormPage(StreamFormMixin, BasePage):
 
     def get_context(self, request, *args, **kwargs):
         context = super().get_context(request, *args, **kwargs)
-        if request.htmx:
-            context["base_template"] = "_partial.html"
-        else:
-            context["base_template"] = "base.html"
+        context["base_template"] = "base.html"
         return context
 
     def process_form_submission(self, form):

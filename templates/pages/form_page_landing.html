@@ -1,14 +1,14 @@
 {% extends base_template %}
-{% load wagtailcore_tags webpack_loader %}
+{% load wagtailcore_tags %}
 
 {% block content %}
 <div id="form-wrapper">
     <h1 class="text-3xl font-bold mb-6">Thank You!</h1>
-    
+
     <div class="prose prose-lg">
         {{ page.thank_you_text|richtext }}
     </div>
-    
+
     <div class="mt-8">
         <a href="/" class="btn btn-primary">
             Return Home
