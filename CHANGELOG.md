@@ -1,5 +1,29 @@
 # Changelog
 
+## [0.2.0](https://github.com/junoxlabs/wagtail-starter-kit/compare/v0.1.0...v0.2.0) (2025-09-24)
+
+
+### Features
+
+* add hotwire turbo ([dead2ef](https://github.com/junoxlabs/wagtail-starter-kit/commit/dead2ef32f81b50b48987e2aeb4644cfde9e3c0c))
+* config security env vars ([2dca75c](https://github.com/junoxlabs/wagtail-starter-kit/commit/2dca75c4f43fd7967293cf716b477e28ef1d1c88))
+* docker compose based dev environment ([3f1864e](https://github.com/junoxlabs/wagtail-starter-kit/commit/3f1864e955614172c2f9965dc7a741710f5a7852))
+* migrate to vite from webpack ([b368df9](https://github.com/junoxlabs/wagtail-starter-kit/commit/b368df9249b578b22ab782b39ae812c09b1126ec))
+* rm htmx; move to stimulus + turbo for forms ([9a9a366](https://github.com/junoxlabs/wagtail-starter-kit/commit/9a9a3660fee92585a3c649680b7f4445082ff435))
+* s3 for wagtail media; works with minio in dev ([47fe036](https://github.com/junoxlabs/wagtail-starter-kit/commit/47fe036dfaac74fce764496ea8ff07ecc794b678))
+* showcase_page init agentic ([af60988](https://github.com/junoxlabs/wagtail-starter-kit/commit/af6098819b278ff712dea6d0385a80d910bd543c))
+* use granian over gunicorn ([d39d0f0](https://github.com/junoxlabs/wagtail-starter-kit/commit/d39d0f08059b08561ce30d3ab3947e373601d283))
+* use sqlite, litestream ([e2da8ec](https://github.com/junoxlabs/wagtail-starter-kit/commit/e2da8ecc1bff5b90171ac2f74deec87016b97a05))
+* working showcase pages ([9e7aa37](https://github.com/junoxlabs/wagtail-starter-kit/commit/9e7aa376ea5a38dc1171898d751c8d9b6866e593))
+
+
+### Bug Fixes
+
+* add DEBUG=true on dev compose ([f3d236f](https://github.com/junoxlabs/wagtail-starter-kit/commit/f3d236f5b37efa13d66f67fa54dc36017b991547))
+* Dockerfile builds; working css. ([fae3757](https://github.com/junoxlabs/wagtail-starter-kit/commit/fae3757b88876c27336aa8e7530e991162845a0d))
+* js in head tag w/ defer ([305d5fa](https://github.com/junoxlabs/wagtail-starter-kit/commit/305d5fa144049c41b1a07b7e062b802050f633f0))
+* rm duplicate uuid field ([28355d8](https://github.com/junoxlabs/wagtail-starter-kit/commit/28355d81efd721f1b08c917b3505bf7057d4d5a2))
+
 ## 0.1.0 (2025-08-11)
 
 
