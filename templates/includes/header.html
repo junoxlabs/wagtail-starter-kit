@@ -9,27 +9,17 @@
             </h1>
         </div>
 
-        {% get_menu "main-menu" as navigation %}
+        {% get_menu_tree "main-menu" as navigation %}
 
         <!-- desktop menu -->
         <div class="navbar-end hidden lg:flex">
             <nav>
                 {% if navigation %}
                 <ul class="menu menu-horizontal px-1">
-                    {% for item in navigation.menu_items.all %}
-                        <li>
-                            <a
-                                href="{{ item.link }}"
-                                class="normal-case"
-                            {% if item.open_in_new_tab %}
-                                target="_blank"
-                            {% endif %}
-                            >
-                                {{ item.title }}
-                            </a>
-                        </li>
-                        {% endfor %}
-                    </ul>
+                    {% for item in navigation %}
+                        {% include "navigation/menu_item.html" with item=item %}
+                    {% endfor %}
+                </ul>
                 {% endif %}
             </nav>
 
@@ -49,19 +39,8 @@
             data-navbar-target="mobileMenu"
         >
             {% if navigation %}
-            {% for item in navigation.menu_items.all %}
-            <li class="border-b border-base-300/80 w-full">
-                <a href="{{ item.link }}"
-                    {% if item.open_in_new_tab %}
-                        target="_blank"
-                    {% endif %}
-
-                    class="block p-3 normal-case text-bold"
-                    data-action="click->navbar#closeMenu"
-                >
-                    {{ item.title }}
-                </a>
-            </li>
+            {% for item in navigation %}
+                {% include "navigation/mobile_menu_item.html" with item=item %}
             {% endfor %}
             {% endif %}
         </ul>

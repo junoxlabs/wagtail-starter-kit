@@ -12,6 +12,14 @@ make install
 # Add node_modules/.bin to PATH for vite command
 export PATH="/app/frontend/node_modules/.bin:$PATH"
 
-echo "Starting supervisord..."
+# Run database migrations
+echo "Running database migrations..."
+make migrate
+
+# Create cache table if it doesn't exist
+echo "Creating cache table..."
+make createcachetable || echo "Cache table creation completed or skipped"
+
 # Start supervisord
+echo "Starting supervisord..."
 exec uv run supervisord -c /etc/supervisor/supervisord.conf

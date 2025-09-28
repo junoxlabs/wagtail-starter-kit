@@ -1,3 +1,1 @@
-from django.contrib import admin
-
-# Register your models here.
+# Wagtail admin interface is configured in wagtail_hooks.py

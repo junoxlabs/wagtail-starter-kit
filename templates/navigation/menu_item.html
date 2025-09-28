@@ -1,3 +1,30 @@
-<a href="{{ self.link }}" class="text-white hover:text-gray-300 px-3 py-2 rounded-md text-sm font-medium">
-  {{ self.title }}
-</a>
+{% load wagtailcore_tags navigation_tags %}
+
+{% if item.item %}
+    {% if item.children %}
+        <!-- Dropdown menu item -->
+        <li class="dropdown dropdown-hover dropdown-end lg:dropdown-bottom">
+            <details>
+                <summary class="flex items-center justify-between gap-1 normal-case">
+                    {{ item.item.title }}
+                </summary>
+                <ul class="dropdown-content menu bg-base-200 w-52 shadow">
+                    {% for child in item.children %}
+                        {% include "navigation/menu_item.html" with item=child %}
+                    {% endfor %}
+                </ul>
+            </details>
+        </li>
+    {% else %}
+        <!-- Regular menu item -->
+        <li>
+            <a
+                href="{{ item.item.link }}"
+                class="normal-case"
+                {% if item.item.open_in_new_tab %}target="_blank"{% endif %}
+            >
+                {{ item.item.title }}
+            </a>
+        </li>
+    {% endif %}
+{% endif %}
