@@ -5,6 +5,7 @@ A modern, flexible foundation for building high-performance marketing websites w
 ## Features
 
 - **Django 5.2 LTS** and **Wagtail 7.0 LTS** - Latest stable versions
+- **SQLite** as primary database with Litestream replication
 - **Tailwind CSS v4** with **DaisyUI v5** - Modern utility-first CSS framework
 - **Turbo 8** + **Stimulus 3** - Enhanced interactivity without complex JavaScript
 - **StreamField Blocks** - Flexible content composition system
@@ -18,72 +19,102 @@ A modern, flexible foundation for building high-performance marketing websites w
 
 ```
 ├── apps/
-│   ├── blocks/          # Custom StreamField blocks
-│   ├── core/            # Base models and utilities
-│   ├── frontend/        # Frontend assets and Tailwind integration
-│   ├── pages/           # Page models and templates
-│   ├── navigation/      # Navigation menu snippets
-│   ├── seo/             # SEO settings and functionality
-│   ├── search/          # Site search functionality
-│   └── forms/           # Form handling
-├── config/              # Django settings and configuration
-├── templates/           # Django templates
-│   ├── pages/           # Page-specific templates
-│   ├── blocks/          # StreamField block templates
-│   ├── includes/        # Reusable template components
-│   └── snippets/        # Snippet templates
-└── static/              # Static files
+│   ├── blocks/                     # Custom StreamField blocks
+│   ├── core/                       # Base models and utilities
+│   ├── pages/                      # Page models and templates
+│   ├── navigation/                 # Navigation menu snippets
+│   ├── search/                     # Site search functionality
+│   ├── settings/                   # Site settings
+│   ├── snippets/                   # Content snippets
+│   └── forms/                      # Form handling
+├── config/                         # Django settings and configuration
+├── db/                             # SQLite database files
+├── dev/                            # Development environment configuration
+│   ├── docker-compose.dev.yml      # Docker Compose configuration for development
+│   ├── Dockerfile                  # Dockerfile for development environment
+│   ├── init.sh                     # Initialization script for development container
+│   ├── litestream.yml              # Litestream configuration for SQLite replication
+│   └── supervisord.conf            # Supervisor configuration for running services
+├── frontend/                       # Frontend source files and build configuration
+│   ├── src/                        # Source files
+│   │   ├── app/                    # JavaScript application code
+│   │   │   ├── main.js             # Main JavaScript entry point
+│   │   │   └── controllers/        # Stimulus controllers
+│   │   │       ├── form.js
+│   │   │       └── navbar.js
+│   │   └── css/                    # CSS source files
+│   │       └── styles.css
+│   ├── package.json                # Frontend dependencies
+│   ├── vite.config.mjs             # Vite build configuration
+│   └── bun.lock                    # Bun lock file
+├── templates/                      # Django templates
+│   ├── pages/                      # Page-specific templates
+│   ├── blocks/                     # StreamField block templates
+│   ├── includes/                   # Reusable template components
+│   └── snippets/                   # Snippet templates
+├── .env                            # Environment variables
+├── .gitignore
+├── Dockerfile
+├── Makefile
+├── manage.py
+├── mise.toml
+├── pyproject.toml
+└── uv.lock
 ```
 
-## Installation
+## Development Setup
 
-1. **Clone the repository**
+This project uses `mise` for dependency management and `Docker` for the development environment.
+
+1. **Prerequisites**
+
+   Install `mise` to manage project dependencies:
+
+   ```bash
+   # On macOS
+   brew install mise
+
+   # Or follow installation instructions at https://mise.jdx.dev/
+   ```
+
+2. **Clone the repository**
 
    ```bash
    git clone <repository-url>
    cd wagtail-starter-kit
    ```
 
-2. **Install dependencies**
+3. **Install dependencies with mise**
 
    ```bash
-   # Using uv (recommended)
-   uv sync
+   # Trust the mise configuration and install dependencies
+   mise trust && mise install
    ```
 
-3. **Set up the database**
+4. **Start the development environment**
 
    ```bash
-   uv run python manage.py migrate
+   # This will start Django, Vite, and all required services in Docker
+   make dev
    ```
 
-4. **Create a superuser**
+5. **Access the application**
 
-   ```bash
-   uv run python manage.py createsuperuser
-   ```
+   - Django: http://localhost:8000
+   - Wagtail Admin: http://localhost:8000/admin/
+   - Django Admin: http://localhost:8000/django-admin/
+   - Vite Dev Server: http://localhost:5173
 
-5. **Install frontend dependencies**
+## Development Workflow
 
-   ```bash
-   cd apps/frontend/static_src
-   bun install
-   ```
+After starting the development environment with `make dev`, you can:
 
-6. **Build frontend assets**
-
-   ```bash
-   # Development build
-   bun run dev
-
-   # Production build
-   bun run build
-   ```
-
-7. **Run the development server**
-   ```bash
-   uv run python manage.py runserver
-   ```
+- View logs: `make dev-logs`
+- Enter the app container: `make dev-bash`
+- Once inside the container, run Django commands like:
+  - `make migrate` - Run database migrations
+  - `make makemigrations` or `make make` - Create new migrations
+- Create a superuser: `make dev-createsuperuser` (run from host)
 
 ## Content Modeling
 
@@ -107,22 +138,26 @@ Inherits from `BasePage`.
 
 Abstract base page for all showcase entities with common fields.
 Inherits from `FlexPage` (and thus `BasePage`).
-- Category (ForeignKey to Category snippet)
+
+- Tag (ForeignKey to Tag snippet)
 - URL type preference (SEO-friendly or UUID-based)
 
-### ShowcasePage Model
+### Showcase Pages
 
-A page that showcases different types of entities (projects, services, portfolio items, resources).
-Can display entities by category and supports filtering by entity type.
-Inherits from `BasePage`.
+Specialized pages for displaying collections of entities:
 
-### ProjectPage, ServicePage, PortfolioItemPage, ResourcePage Models
+- ProjectShowcasePage: Displays projects
+- ServiceShowcasePage: Displays services
+- PortfolioShowcasePage: Displays portfolio items
+- ResourceShowcasePage: Displays resources
+
+### ProjectPage, ServicePage, PortfolioItemPage Models
 
 Specific page types for different entity categories:
+
 - ProjectPage: Inherits from `BaseEntityPage`
 - ServicePage: Inherits from `BaseEntityPage`
 - PortfolioItemPage: Inherits from `BaseEntityPage`
-- ResourcePage: Inherits from `BaseEntityPage`
 
 ### StreamField Blocks
 
@@ -150,8 +185,12 @@ The starter kit includes a comprehensive set of reusable blocks:
 
 ### Navigation Snippets
 
-- Menu: Container for menu items
-- MenuItem: Individual menu items with links to pages or URLs
+- Menu: Container for hierarchical menu items
+- MenuItem: Individual menu items with links to pages or URLs, supporting nested structures
+
+### Content Snippets
+
+- Tag: For categorizing and organizing showcase entities
 
 ## Frontend Architecture
 
@@ -173,7 +212,8 @@ The starter kit includes a comprehensive set of reusable blocks:
 
 ## Performance Features
 
-- Sqlite caching with wagtail-cache
+- SQLite as primary database with Litestream replication
+- Seperate SQLite database for caching with wagtail-cache
 - Frontend cache invalidation
 - Template fragment caching
 - Image optimization with Wagtail's image tag
