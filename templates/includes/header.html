@@ -1,11 +1,11 @@
-{% load static wagtailcore_tags navigation_tags %}
+{% load static wagtailcore_tags navigation_tags wagtailsettings_tags %}
 
 <!-- header / navigation Menu -->
 <header class="bg-base-300 shadow-sm relative">
     <div class="navbar container mx-auto" data-controller="navbar">
         <div class="navbar-start">
             <h1 class="text-xl font-bold">
-                <a href="/">Wagtail Starter Kit</a>
+                <a href="/">{{ settings.settings.SiteSettings.site_title|default:"Wagtail Starter Kit" }}</a>
             </h1>
         </div>
 

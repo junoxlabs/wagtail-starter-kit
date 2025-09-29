@@ -34,6 +34,7 @@ class SiteSettings(BaseSiteSetting, ClusterableModel):
         max_length=255,
         blank=True,
         null=True,
+        default="Wagtail Starter Kit",
         help_text="The site title"
     )
     site_description = models.TextField(
