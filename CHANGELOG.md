@@ -1,5 +1,14 @@
 # Changelog
 
+## [0.2.1](https://github.com/junoxlabs/wagtail-starter-kit/compare/v0.2.0...v0.2.1) (2025-09-29)
+
+
+### Bug Fixes
+
+* app name / site title not showing in frontend ([4b467b4](https://github.com/junoxlabs/wagtail-starter-kit/commit/4b467b40e8c9c1e7ce7d1f75ec362723804a7158))
+* nav/menu admin menu; consistent animations ([a39ad62](https://github.com/junoxlabs/wagtail-starter-kit/commit/a39ad626e5bc02b5384627c384fa7b8ac3b8e211))
+* outdated docs / README ([eb92339](https://github.com/junoxlabs/wagtail-starter-kit/commit/eb923395b873f73445865c81c422237839153e00))
+
 ## [0.2.0](https://github.com/junoxlabs/wagtail-starter-kit/compare/v0.1.0...v0.2.0) (2025-09-24)
 
 
