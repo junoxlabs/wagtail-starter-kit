@@ -13,6 +13,7 @@ __pycache__/
 *.pyo
 *.pyd
 .venv/
+*.venv/
 *.egg-info/
 pip-wheel-metadata/
 

@@ -1,6 +1,5 @@
 [tools]
 bun = "1.2"
-node = "22"
+litestream = "0.3.13"
 python = "3.12"
-ruff = "0.12"
 uv = "0.8"
