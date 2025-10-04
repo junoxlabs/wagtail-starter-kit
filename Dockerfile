@@ -1,5 +1,5 @@
 ####! Builder stage - optimized for size
-FROM almalinux:10 AS builder
+FROM almalinux:9 AS builder
 
 # Set environment variables for build
 ENV UV_NO_CACHE=1 \
@@ -7,17 +7,15 @@ ENV UV_NO_CACHE=1 \
     UV_COMPILE_BYTECODE=1 \
     UV_SYSTEM_PYTHON=1
 
-# Install only essential build tools
-RUN dnf install -y dnf-plugins-core && \
-    dnf copr enable -y jdxcode/mise && \
-    dnf install -y --nodocs \
-    mise \
-    curl \
+
+RUN dnf install -y dnf-plugins-core \
     unzip \
     make \
     gcc \
     openssl-devel \
     libffi-devel \
+    && dnf config-manager --add-repo https://mise.jdx.dev/rpm/mise.repo \
+    && dnf install -y --nodocs mise \
     && dnf clean all
 
 # Set working directory
@@ -43,7 +41,7 @@ RUN make install && \
 # ----------------------------------------------------------------
 
 ####! Runtime stage - minimal dependencies only
-FROM almalinux:10 AS runtime
+FROM almalinux:9 AS runtime
 
 # Set environment variables for production
 ENV ENVIRONMENT=production \
@@ -59,13 +57,12 @@ RUN mkdir -p /home/wagtail && \
     chown -R root:wagtail /opt/mise && \
     chmod -R 755 /opt/mise
 
+
 # Install only runtime dependencies
-RUN dnf install -y dnf-plugins-core && \
-    dnf copr enable -y jdxcode/mise && \
-    dnf install -y --nodocs \
-    mise \
-    curl \
+RUN dnf install -y dnf-plugins-core \
     make \
+    && dnf config-manager --add-repo https://mise.jdx.dev/rpm/mise.repo \
+    && dnf install -y --nodocs mise \
     && dnf clean all
 
 # Set working directory
