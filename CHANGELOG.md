@@ -1,5 +1,15 @@
 # Changelog
 
+## [0.2.2](https://github.com/junoxlabs/wagtail-starter-kit/compare/v0.2.1...v0.2.2) (2025-10-09)
+
+
+### Bug Fixes
+
+* env file sample for prod ([8db8f97](https://github.com/junoxlabs/wagtail-starter-kit/commit/8db8f972d6fdef54aa8f7bbc4e75f3cc71dc8c4a))
+* move Dockerfile to root dir ([d2c7b83](https://github.com/junoxlabs/wagtail-starter-kit/commit/d2c7b83d64ad69c1e2729ebad24ef5bdf94395e4))
+* prod Dockerfile works ([e1b24f4](https://github.com/junoxlabs/wagtail-starter-kit/commit/e1b24f4f32a207f85b7e8e2bec9e9a00d78ea631))
+* use almalinux 9; 10 doesn't support older cpu ([aa230b3](https://github.com/junoxlabs/wagtail-starter-kit/commit/aa230b31270f403663b8d0f0a96fb9ab819ca46f))
+
 ## [0.2.1](https://github.com/junoxlabs/wagtail-starter-kit/compare/v0.2.0...v0.2.1) (2025-09-29)
 
 
